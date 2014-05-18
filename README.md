@@ -48,7 +48,7 @@ $.htmlParser(html, {
 ```
     
 
-##### Example 3: Transform an HTML/XML document to a new one
+#### Example 3: Transform an HTML/XML document to a new one
 
 ```JavaScript
 // Example 3: transform a HTML document to another one
