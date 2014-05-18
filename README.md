@@ -51,8 +51,8 @@ $.htmlParser(html, {
 #### Example 3: Transform an HTML/XML document to a new one
 
 ```JavaScript
-// Example 3: transform a HTML document to another one
-// This examples replaces the following CSS properties:
+// Example 3: transform an HTML document to another one
+// This example replaces the following CSS properties:
 //     1. 'font-weight: bold' is replaced by '<strong>'
 //     2. 'font-style: italic' is replaced by '<em>'
 //     3. 'text-decoration: underline' is replaced by '<u>'
