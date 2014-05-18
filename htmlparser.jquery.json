@@ -1,0 +1,38 @@
+{
+  "name": "htmlparser",
+  "title": "Parse, fix or transform an HTML/XML docment",
+  "description": "This plugin parses, fixes or transforms an HTML/XML document",
+  "keywords": [
+    "jquery",
+    "html",
+    "parser",
+    "transform",
+    "fix",
+    "clean",
+    "plugins"
+  ],
+  "version": "0.1.0",
+  "author": {
+    "name": "Gonzalo Chumillas",
+    "url": "https://github.com/soloproyectos"
+  },
+  "maintainers": [
+    {
+      "name": "Gonzalo Chumillas",
+      "url": "https://github.com/soloproyectos"
+    }
+  ],
+  "licenses": [
+    {
+      "type": "Apache Software License 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  ],
+  "bugs": "https://github.com/soloproyectos/jquery.htmlparser/issues",
+  "homepage": "https://github.com/soloproyectos/jquery.htmlparser",
+  "docs": "https://github.com/soloproyectos/jquery.htmlparser",
+  "download": "https://github.com/soloproyectos/jquery.htmlparser/archive/master.zip",
+  "dependencies": {
+    "jquery": ">=1.9"
+  }
+}
