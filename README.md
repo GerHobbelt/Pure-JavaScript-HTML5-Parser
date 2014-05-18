@@ -19,7 +19,7 @@ Download the jquery.htmlparser.js file in your project.
 #### Examples 1: Clean a bad-formed HTML/XML document
 
 ```JavaScript
-// fixes a bad-formed HTML document
+// Example 1: fixes a bad-formed HTML document
 $html = $.htmlParser('<p>Bad formed<br> html document');
 ```
     
@@ -51,7 +51,7 @@ $.htmlParser(html, {
 #### Example 3: Transform an HTML/XML document to a new one
 
 ```JavaScript
-// Example 3: transform an HTML document to another one
+// Example 3: transforms an HTML document to another one
 // This example replaces the following CSS properties:
 //     1. 'font-weight: bold' is replaced by '<strong>'
 //     2. 'font-style: italic' is replaced by '<em>'
