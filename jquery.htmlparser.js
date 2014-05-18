@@ -89,7 +89,7 @@
  * http://ejohn.org/files/htmlparser.js
  * 
  * and then changed by Sam Blowes:
- * https://github.com/soloproyectos/jquery.htmlparser/blob/master/htmlparser.js
+ * https://github.com/blowsie/Pure-JavaScript-HTML5-Parser
  * 
  * and then changed by me to work as a jQuery plugin:
  * https://github.com/soloproyectos/jquery.htmlparser
