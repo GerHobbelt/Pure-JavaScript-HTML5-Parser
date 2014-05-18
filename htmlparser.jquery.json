@@ -31,7 +31,7 @@
   "bugs": "https://github.com/soloproyectos/jquery.htmlparser/issues",
   "homepage": "https://github.com/soloproyectos/jquery.htmlparser",
   "docs": "https://github.com/soloproyectos/jquery.htmlparser",
-  "download": "https://github.com/soloproyectos/jquery.htmlparser/archive/master.zip",
+  "download": "https://github.com/soloproyectos/jquery.htmlparser/releases",
   "dependencies": {
     "jquery": ">=1.9"
   }
