@@ -21,66 +21,66 @@
  * 
  * // Example 2: parses an HTML document
  * var html =
- * 		'<p>Actually <strong>we do not exist</strong>.<br />' +
- * 		'But before we can prove it, <em>we will have already disappeared.</em></p>';
+ *         '<p>Actually <strong>we do not exist</strong>.<br />' +
+ *         'But before we can prove it, <em>we will have already disappeared.</em></p>';
  * $.htmlParser(html, {
- * 		start: function () {
- * 			// 'this' is a jQuery object representing the current node
- * 			console.log('Start tag: <' + this.prop('tagName') + '>');
- * 		},
- * 		end: function () {
- * 			console.log('End tag: </' + this.prop('tagName') + '>');
- * 		},
- * 		text: function () {
- * 			console.log('Text: ' + this.text());
- * 		},
- * 		comment: function (text) {
- * 			console.log('Comment: ' + this.text());
- * 		}
+ *         start: function () {
+ *             // 'this' is a jQuery object representing the current node
+ *             console.log('Start tag: <' + this.prop('tagName') + '>');
+ *         },
+ *         end: function () {
+ *             console.log('End tag: </' + this.prop('tagName') + '>');
+ *         },
+ *         text: function () {
+ *             console.log('Text: ' + this.text());
+ *         },
+ *         comment: function (text) {
+ *             console.log('Comment: ' + this.text());
+ *         }
  * });
  * 
  * // Example 3: transform a HTML document to another one
  * // This examples replaces the following CSS properties:
- * // 		1. 'font-weight: bold' is replaced by '<strong>'
- * //		2. 'font-style: italic' is replaced by '<em>'
- * //		3. 'text-decoration: underline' is replaced by '<u>'
+ * //     1. 'font-weight: bold' is replaced by '<strong>'
+ * //     2. 'font-style: italic' is replaced by '<em>'
+ * //     3. 'text-decoration: underline' is replaced by '<u>'
  * var html =
- * 		'The quick <span style="font-weight: bold; ">brown</span> fox jumps over the ' +
- * 		'<span style="font-style: italic; ">lazy dog</span> and feels as if ' +
- * 		'<span style="text-decoration: underline; font-weight: bold; ">he were in the </span> ' +
- * 		'seventh <span style="font-weight: bold; font-style: italic; ">heaven of</span> ' +
- * 		'typography together with Hermann Zapf, the most famous artist of the...';
- * 	var str = $.htmlParser(html, function () {
- * 		var ret = this;
- * 		var replacements = [
- * 			{style: 'font-weight', value: 'bold', entity: 'strong'},
- * 			{style: 'font-style', value: 'italic', entity: 'em'},
- * 			{style: 'text-decoration', value: 'underline', entity: 'u'}
- * 		];
- * 		
- * 		// 'this' is an object representing the current node
- * 		if (this.prop('tagName') == 'SPAN') {
- * 			var target = this;
- * 			
- * 			$.each(replacements, function () {
- * 				if (target.css(this.style) == this.value) {
- * 					// wraps the result around the corresponding entity
- * 					ret = $('<' + this.entity + ' />').append(ret);
- * 					
- * 					// removes the css style
- * 					target.css(this.style, '');
- * 					
- * 					// removes the 'span' node if it doesn't have any attribute
- * 					if (target[0].attributes.length == 0) {
- * 						target.replaceWith(target.contents());
- * 					}
- * 				}
- * 			});
- * 		}
- * 		
- * 		return ret;
- * 	});
- * 	console.log(str);
+ *     'The quick <span style="font-weight: bold; ">brown</span> fox jumps over the ' +
+ *     '<span style="font-style: italic; ">lazy dog</span> and feels as if ' +
+ *     '<span style="text-decoration: underline; font-weight: bold; ">he were in the </span> ' +
+ *     'seventh <span style="font-weight: bold; font-style: italic; ">heaven of</span> ' +
+ *     'typography together with Hermann Zapf, the most famous artist of the...';
+ * var str = $.htmlParser(html, function () {
+ *     var ret = this;
+ *     var replacements = [
+ *         {style: 'font-weight', value: 'bold', entity: 'strong'},
+ *         {style: 'font-style', value: 'italic', entity: 'em'},
+ *         {style: 'text-decoration', value: 'underline', entity: 'u'}
+ *     ];
+ *     
+ *     // 'this' is an object representing the current node
+ *     if (this.prop('tagName') == 'SPAN') {
+ *         var target = this;
+ *         
+ *         $.each(replacements, function () {
+ *             if (target.css(this.style) == this.value) {
+ *                 // wraps the result around the corresponding entity
+ *                 ret = $('<' + this.entity + ' />').append(ret);
+ *                 
+ *                 // removes the css style
+ *                 target.css(this.style, '');
+ *                 
+ *                 // removes the 'span' node if it doesn't have any attribute
+ *                 if (target[0].attributes.length == 0) {
+ *                     target.replaceWith(target.contents());
+ *                 }
+ *             }
+ *         });
+ *     }
+ *     
+ *     return ret;
+ * });
+ * console.log(str);
  * 
  * This code was originally designed by Erik Arvidsson:
  * http://erik.eae.net/simplehtmlparser/simplehtmlparser.js
@@ -124,14 +124,14 @@
     // Special Elements (can contain anything)
     var special = makeMap("script,style");
 
-	/**
-	 * This class parses an HTML/XML document.
-	 * 
-	 * @param {String} html    HTML/XML document
-	 * @param {Object} handler Plain object
-	 * 
-	 * @return {HTMLParser}
-	 */
+    /**
+     * This class parses an HTML/XML document.
+     * 
+     * @param {String} html    HTML/XML document
+     * @param {Object} handler Plain object
+     * 
+     * @return {HTMLParser}
+     */
     var HTMLParser = function (html, handler) {
         var index, chars, match, stack = [], last = html;
         stack.last = function () {
@@ -282,30 +282,30 @@
      * 
      * @return {String}
      */
-	var html2xml = function (html) {
-		var results = "";
+    var html2xml = function (html) {
+        var results = "";
 
-		HTMLParser(html, {
-			start: function (tag, attrs, unary) {
-				results += "<" + tag;
+        HTMLParser(html, {
+            start: function (tag, attrs, unary) {
+                results += "<" + tag;
 
-				for (var i = 0; i < attrs.length; i++)
-					results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
-				results += unary? " />" : ">";
-			},
-			end: function (tag) {
-				results += "</" + tag + ">";
-			},
-			chars: function (text) {
-				results += text;
-			},
-			comment: function (text) {
-				results += "<!--" + text + "-->";
-			}
-		});
+                for (var i = 0; i < attrs.length; i++)
+                    results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
+                results += unary? " />" : ">";
+            },
+            end: function (tag) {
+                results += "</" + tag + ">";
+            },
+            chars: function (text) {
+                results += text;
+            },
+            comment: function (text) {
+                results += "<!--" + text + "-->";
+            }
+        });
 
-		return results;
-	};
+        return results;
+    };
     
     /**
      * This plugin parses an HTML/XML document.
@@ -316,93 +316,93 @@
      * @return {String}
      */
     $.htmlParser = function (html, handler) {
-		var nodes = [$('<div />')];
-		
-		// executes a handler
-		function exec(handler, node) {
-			var item = $.proxy(handler, node)();
-			return item !== undefined? item : node;
-		}
-		
-		// adds a node to nodes
-		function pushNode(tagName, attrs, handler) {
-			var node = $('<' + tagName + '/>');
-			
-			// appends attributes
-			$.each(attrs, function () {
-				node.attr(this.name, this.value);
-			});
-			
-			nodes.push(handler !== undefined? exec(handler, node) : node);
-		}
-		
-		// removes the last node from nodes
-		function popNode(handler) {
-			var node = nodes.pop();
-			var parentNode = nodes[nodes.length - 1];
-			
-			parentNode.append(handler !== undefined? exec(handler, node) : node);
-		}
-		
-		// appends a text node to the last element of nodes
-		function appendText(text, handler) {
-			var node = $(document.createTextNode(text));
-			var parentNode = nodes[nodes.length - 1];
-			
-			parentNode.append(handler !== undefined? exec(handler, node) : node);
-		}
-		
-		// appends a comment node to the last element of nodes
-		function appendComment(text, handler) {
-			var node = $(document.createComment(text));
-			var parentNode = nodes[nodes.length - 1];				
-			
-			parentNode.append(handler !== undefined? exec(handler, node) : node);
-		}
-		
-		if ($.isPlainObject(handler)) {
-			new HTMLParser(html, {
-				start: function (tagName, attrs, unary) {
-					pushNode(tagName, attrs, handler.start);
-					
-					if (unary) {
-						popNode(handler.end);
-					}
-				},
-				end: function (tagName) {
-					popNode(handler.end);
-				},
-				chars: function (text) {
-					appendText(text, handler.text);
-				},
-				comment: function (text) {
-					appendComment(text, handler.comment);
-				}
-			});
-		} else
-		if ($.type(handler) == 'function') {
-			new HTMLParser(html, {
-				start: function (tagName, attrs, unary) {
-					pushNode(tagName, attrs);
-					
-					if (unary) {
-						popNode(handler);
-					}
-				},
-				end: function (tagName) {
-					popNode(handler);
-				},
-				chars: function (text) {
-					appendText(text, handler);
-				},
-				comment: function (text) {
-					appendComment(text, handler);
-				}
-			});
-		} else {
-			return html2xml(html);
-		}
-		
-		return nodes.pop().html();
+        var nodes = [$('<div />')];
+        
+        // executes a handler
+        function exec(handler, node) {
+            var item = $.proxy(handler, node)();
+            return item !== undefined? item : node;
+        }
+        
+        // adds a node to nodes
+        function pushNode(tagName, attrs, handler) {
+            var node = $('<' + tagName + '/>');
+            
+            // appends attributes
+            $.each(attrs, function () {
+                node.attr(this.name, this.value);
+            });
+            
+            nodes.push(handler !== undefined? exec(handler, node) : node);
+        }
+        
+        // removes the last node from nodes
+        function popNode(handler) {
+            var node = nodes.pop();
+            var parentNode = nodes[nodes.length - 1];
+            
+            parentNode.append(handler !== undefined? exec(handler, node) : node);
+        }
+        
+        // appends a text node to the last element of nodes
+        function appendText(text, handler) {
+            var node = $(document.createTextNode(text));
+            var parentNode = nodes[nodes.length - 1];
+            
+            parentNode.append(handler !== undefined? exec(handler, node) : node);
+        }
+        
+        // appends a comment node to the last element of nodes
+        function appendComment(text, handler) {
+            var node = $(document.createComment(text));
+            var parentNode = nodes[nodes.length - 1];                
+            
+            parentNode.append(handler !== undefined? exec(handler, node) : node);
+        }
+        
+        if ($.isPlainObject(handler)) {
+            new HTMLParser(html, {
+                start: function (tagName, attrs, unary) {
+                    pushNode(tagName, attrs, handler.start);
+                    
+                    if (unary) {
+                        popNode(handler.end);
+                    }
+                },
+                end: function (tagName) {
+                    popNode(handler.end);
+                },
+                chars: function (text) {
+                    appendText(text, handler.text);
+                },
+                comment: function (text) {
+                    appendComment(text, handler.comment);
+                }
+            });
+        } else
+        if ($.type(handler) == 'function') {
+            new HTMLParser(html, {
+                start: function (tagName, attrs, unary) {
+                    pushNode(tagName, attrs);
+                    
+                    if (unary) {
+                        popNode(handler);
+                    }
+                },
+                end: function (tagName) {
+                    popNode(handler);
+                },
+                chars: function (text) {
+                    appendText(text, handler);
+                },
+                comment: function (text) {
+                    appendComment(text, handler);
+                }
+            });
+        } else {
+            return html2xml(html);
+        }
+        
+        return nodes.pop().html();
     };
 })(jQuery);

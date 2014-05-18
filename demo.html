@@ -6,74 +6,74 @@
     <script type="text/javascript" src="//code.jquery.com/jquery-1.9.1.js"></script>
     <script type="text/javascript" src="jquery.htmlparser.js"></script>
     <script type="text/javascript">
-		$(function () {
-			// initializes text areas with default values
-			$('#html1').val('<p>Bad formed<br> html document');
-			$('#html2').val(
-				'The quick <span style="font-weight: bold; ">brown</span> fox jumps over the ' +
-				'<span style="font-style: italic; ">lazy dog</span> and feels as if ' +
-				'<span style="text-decoration: underline; font-weight: bold; ">he were in the </span> ' +
-				'seventh <span style="font-weight: bold; font-style: italic; ">heaven of</span> ' +
-				'typography together with Hermann Zapf, the most famous artist of the...'
-			);
-			
-			// fixes a bad-formed HTML/XML document
-			$('#fix-html').click(function () {
-				$('#html1').val($.htmlParser($('#html1').val()));
-			});
-			
-			// transforms an HTML/XML document to a new one
-			$('#transform-html').click(function () {
-				var str = $.htmlParser($('#html2').val(), function () {
-					var ret = this;
-					var replacements = [
-						{style: 'font-weight', value: 'bold', entity: 'strong'},
-						{style: 'font-style', value: 'italic', entity: 'em'},
-						{style: 'text-decoration', value: 'underline', entity: 'u'}
-					];
-					
-					if (this.prop('tagName') == 'SPAN') {
-						var target = this;
-						
-						$.each(replacements, function () {
-							if (target.css(this.style) == this.value) {
-								// wraps the result around the corresponding entity
-								ret = $('<' + this.entity + ' />').append(ret);
-								
-								// removes the css style
-								target.css(this.style, '');
-								
-								// removes the 'span' node if it doesn't have any attribute
-								if (target[0].attributes.length == 0) {
-									target.replaceWith(target.contents());
-								}
-							}
-						});
-					}
-					
-					return ret;
-				});
-				
-				$('#html2').val(str);
-			});
-		});
+        $(function () {
+            // initializes text areas with default values
+            $('#html1').val('<p>Bad formed<br> html document');
+            $('#html2').val(
+                'The quick <span style="font-weight: bold; ">brown</span> fox jumps over the ' +
+                '<span style="font-style: italic; ">lazy dog</span> and feels as if ' +
+                '<span style="text-decoration: underline; font-weight: bold; ">he were in the </span> ' +
+                'seventh <span style="font-weight: bold; font-style: italic; ">heaven of</span> ' +
+                'typography together with Hermann Zapf, the most famous artist of the...'
+            );
+            
+            // fixes a bad-formed HTML/XML document
+            $('#fix-html').click(function () {
+                $('#html1').val($.htmlParser($('#html1').val()));
+            });
+            
+            // transforms an HTML/XML document to a new one
+            $('#transform-html').click(function () {
+                var str = $.htmlParser($('#html2').val(), function () {
+                    var ret = this;
+                    var replacements = [
+                        {style: 'font-weight', value: 'bold', entity: 'strong'},
+                        {style: 'font-style', value: 'italic', entity: 'em'},
+                        {style: 'text-decoration', value: 'underline', entity: 'u'}
+                    ];
+                    
+                    if (this.prop('tagName') == 'SPAN') {
+                        var target = this;
+                        
+                        $.each(replacements, function () {
+                            if (target.css(this.style) == this.value) {
+                                // wraps the result around the corresponding entity
+                                ret = $('<' + this.entity + ' />').append(ret);
+                                
+                                // removes the css style
+                                target.css(this.style, '');
+                                
+                                // removes the 'span' node if it doesn't have any attribute
+                                if (target[0].attributes.length == 0) {
+                                    target.replaceWith(target.contents());
+                                }
+                            }
+                        });
+                    }
+                    
+                    return ret;
+                });
+                
+                $('#html2').val(str);
+            });
+        });
     </script>
 </head>
 
 <body>
-	<h3>Example 1: fix a bad-formed HTML/XML document</h3>
-	This example fixes a bad-formed HTML/XML document:<br>
-	<textarea id="html1" style="width: 480px; height: 240px; "></textarea><br>
-	<input type="button" id="fix-html" value="Fix HTML">
-	
-	<h3>Example 2: transform an HTML/XML document</h3>
-	This example replaces the following CSS properties:
-	<ul>
-		<li>font-weight:bold => <strong>&lt;strong&gt;</strong></li>
-		<li>font-style:italic => <em>&lt;em&gt;</em></li>
-		<li>text-decoration:underline => <u>&lt;u&gt;</u></li>
-	</ul>
-	<textarea id="html2" style="width: 480px; height: 240px; "></textarea><br>
-	<input type="button" id="transform-html" value="Transform HTML">
+    <h3>Example 1: fix a bad-formed HTML/XML document</h3>
+    This example fixes a bad-formed HTML/XML document:<br>
+    <textarea id="html1" style="width: 480px; height: 240px; "></textarea><br>
+    <input type="button" id="fix-html" value="Fix HTML">
+    
+    <h3>Example 2: transform an HTML/XML document</h3>
+    This example replaces the following CSS properties:
+    <ul>
+        <li>font-weight:bold => <strong>&lt;strong&gt;</strong></li>
+        <li>font-style:italic => <em>&lt;em&gt;</em></li>
+        <li>text-decoration:underline => <u>&lt;u&gt;</u></li>
+    </ul>
+    <textarea id="html2" style="width: 480px; height: 240px; "></textarea><br>
+    <input type="button" id="transform-html" value="Transform HTML">
 </body>
 </html>
