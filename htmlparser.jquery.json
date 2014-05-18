@@ -1,6 +1,6 @@
 {
   "name": "htmlparser",
-  "title": "Parse, fix or transform an HTML/XML docment",
+  "title": "Parse, fix or transform an HTML/XML document",
   "description": "This plugin parses, fixes or transforms an HTML/XML document",
   "keywords": [
     "jquery",
