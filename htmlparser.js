@@ -1,8 +1,11 @@
+/*global DOMDocument, ActiveXObject*/
+
 /*
- * HTML5 Parser By Sam Blowes
+ * HTML5 Parser
  *
  * Designed for HTML5 documents
  *
+ * Original Code from HTML5 Parser By Sam Blowes (https://github.com/blowsie/Pure-JavaScript-HTML5-Parser)
  * Original code by John Resig (ejohn.org)
  * http://ejohn.org/blog/pure-javascript-html-parser/
  * Original code by Erik Arvidsson, Mozilla Public License
@@ -67,7 +70,7 @@
 			if (!stack.last() || !special[stack.last()]) {
 
 				// Comment
-				if (html.indexOf("<!--") == 0) {
+				if (html.indexOf("<!--") === 0) {
 					index = html.indexOf("-->");
 
 					if (index >= 0) {
@@ -78,7 +81,7 @@
 					}
 
 					// end tag
-				} else if (html.indexOf("</") == 0) {
+				} else if (html.indexOf("</") === 0) {
 					match = html.match(endTag);
 
 					if (match) {
@@ -88,7 +91,7 @@
 					}
 
 					// start tag
-				} else if (html.indexOf("<") == 0) {
+				} else if (html.indexOf("<") === 0) {
 					match = html.match(startTag);
 
 					if (match) {
@@ -110,7 +113,7 @@
 
 			} else {
 				html = html.replace(new RegExp("([\\s\\S]*?)<\/" + stack.last() + "[^>]*>"), function (all, text) {
-					text = text.replace(/<!--([\s\S]*?)-->|<!\[CDATA\[([\s\S]*?)]]>/g, "$1$2");
+					text = text.replace(/<!--([\s\S]*?)-->|<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1$2");
 					if (handler.chars)
 						handler.chars(text);
 
@@ -120,7 +123,7 @@
 				parseEndTag("", stack.last());
 			}
 
-			if (html == last)
+			if (html === last)
 				throw "Parse Error: " + html;
 			last = html;
 		}
@@ -137,7 +140,7 @@
 				}
 			}
 
-			if (closeSelf[tagName] && stack.last() == tagName) {
+			if (closeSelf[tagName] && stack.last() === tagName) {
 				parseEndTag("", tagName);
 			}
 
@@ -168,19 +171,20 @@
 		}
 
 		function parseEndTag(tag, tagName) {
+			var pos;
 			// If no tag name is provided, clean shop
 			if (!tagName)
-				var pos = 0;
+				pos = 0;
 
 				// Find the closest opened tag of the same type
 			else
-				for (var pos = stack.length - 1; pos >= 0; pos--)
-					if (stack[pos] == tagName)
+				for (pos = stack.length - 1; pos >= 0; pos -= 1)
+					if (stack[pos] === tagName)
 						break;
 
 			if (pos >= 0) {
 				// Close all the open elements, up the stack
-				for (var i = stack.length - 1; i >= pos; i--)
+				for (var i = stack.length - 1; i >= pos; i -= 1)
 					if (handler.end)
 						handler.end(stack[i]);
 
@@ -197,7 +201,7 @@
 			start: function (tag, attrs, unary) {
 				results += "<" + tag;
 
-				for (var i = 0; i < attrs.length; i++)
+				for (var i = 0; i < attrs.length; i += 1)
 					results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
 				results += ">";
 			},
@@ -226,11 +230,11 @@
 		};
 
 		if (!doc) {
-			if (typeof DOMDocument != "undefined")
+			if (typeof DOMDocument !== "undefined")
 				doc = new DOMDocument();
-			else if (typeof document != "undefined" && document.implementation && document.implementation.createDocument)
+			else if (typeof document !== "undefined" && document.implementation && document.implementation.createDocument)
 				doc = document.implementation.createDocument("", "", null);
-			else if (typeof ActiveX != "undefined")
+			else if (typeof ActiveX !== "undefined")
 				doc = new ActiveXObject("Msxml.DOMDocument");
 
 		} else
@@ -244,14 +248,16 @@
 
 		// If we're dealing with an empty document then we
 		// need to pre-populate it with the HTML document structure
-		if (!documentElement && doc.createElement) (function () {
-			var html = doc.createElement("html");
-			var head = doc.createElement("head");
-			head.appendChild(doc.createElement("title"));
-			html.appendChild(head);
-			html.appendChild(doc.createElement("body"));
-			doc.appendChild(html);
-		})();
+		if (!documentElement && doc.createElement) {
+			(function () {
+				var html = doc.createElement("html");
+				var head = doc.createElement("head");
+				head.appendChild(doc.createElement("title"));
+				html.appendChild(head);
+				html.appendChild(doc.createElement("body"));
+				doc.appendChild(html);
+			}());
+		}
 
 		// Find all the unique elements
 		if (doc.getElementsByTagName)
@@ -279,7 +285,7 @@
 				for (var attr in attrs)
 					elem.setAttribute(attrs[attr].name, attrs[attr].value);
 
-				if (structure[tagName] && typeof one[structure[tagName]] != "boolean")
+				if (structure[tagName] && typeof one[structure[tagName]] !== "boolean")
 					one[structure[tagName]].appendChild(elem);
 
 				else if (curParentNode && curParentNode.appendChild)
@@ -309,8 +315,8 @@
 
 	function makeMap(str) {
 		var obj = {}, items = str.split(",");
-		for (var i = 0; i < items.length; i++)
+		for (var i = 0; i < items.length; i += 1)
 			obj[items[i]] = true;
 		return obj;
 	}
-})();
+}());
