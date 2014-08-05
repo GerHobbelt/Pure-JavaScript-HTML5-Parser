@@ -11,18 +11,7 @@
  * Original code by Erik Arvidsson, Mozilla Public License
  * http://erik.eae.net/simplehtmlparser/simplehtmlparser.js
  *
- * // Use like so:
- * HTMLParser(htmlString, {
- *     start: function(tag, attrs, unary) {},
- *     end: function(tag) {},
- *     chars: function(text) {},
- *     comment: function(text) {}
- * });
- *
- * // or to get an XML string:
- * HTMLtoXML(htmlString);
- *
- * // or to get an XML DOM Document
+ * // or to get an DOM Document
  * HTMLtoDOM(htmlString);
  *
  * // or to inject into an existing document/DOM node
@@ -30,8 +19,20 @@
  * HTMLtoDOM(htmlString, document.body);
  *
  */
-
-(function () {
+(function (root, factory) {
+	if (typeof define === 'function' && define.amd) {
+		define(factory.bind(this));
+	} else if (typeof exports === 'object') { //nodejs
+		var jsdom = require('jsdom').jsdom,
+			window = jsdom('').parentWindow;
+		module.exports = factory(window);
+	} else {
+		root.HTMLtoDOM = factory();
+	}
+}(this, function (window) {
+	//browser and jsdom compatibility
+	window = window || this;
+	var document = window.document;
 
 	// Regular Expressions for parsing tags and attributes
 	var startTag = /^<([-A-Za-z0-9_]+)((?:\s+[a-zA-Z_:][-a-zA-Z0-9_:.]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/,
@@ -58,7 +59,7 @@
 	// Special Elements (can contain anything)
 	var special = makeMap("script,style");
 
-	var HTMLParser = this.HTMLParser = function (html, handler) {
+	var HTMLParser = function (html, handler) {
 		var index, chars, match, stack = [], last = html;
 		stack.last = function () {
 			return this[this.length - 1];
@@ -204,32 +205,7 @@
 		}
 	};
 
-	this.HTMLtoXML = function (html) {
-		var results = "";
-
-		HTMLParser(html, {
-			start: function (tag, attrs, unary) {
-				results += "<" + tag;
-
-				for (var i = 0; i < attrs.length; i += 1)
-					results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
-				results += ">";
-			},
-			end: function (tag) {
-				results += "</" + tag + ">";
-			},
-			chars: function (text) {
-				results += text;
-			},
-			comment: function (text) {
-				results += "<!--" + text + "-->";
-			}
-		});
-
-		return results;
-	};
-
-	this.HTMLtoDOM = function (html, doc) {
+	var HTMLtoDOM = function (html, doc) {
 		// There can be only one of these elements
 		var one = makeMap("html,head,body,title");
 
@@ -244,9 +220,6 @@
 				doc = new DOMDocument();
 			else if (typeof document !== "undefined" && document.implementation && document.implementation.createDocument)
 				doc = document.implementation.createDocument("", "", null);
-			else if (typeof ActiveX !== "undefined")
-				doc = new ActiveXObject("Msxml.DOMDocument");
-
 		} else
 			doc = doc.ownerDocument ||
 				doc.getOwnerDocument && doc.getOwnerDocument() ||
@@ -334,4 +307,7 @@
 			obj[items[i]] = true;
 		return obj;
 	}
-}());
+
+	HTMLtoDOM.Parser = HTMLParser;
+	return HTMLtoDOM;
+}));
