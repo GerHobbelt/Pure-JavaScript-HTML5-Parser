@@ -1,0 +1,31 @@
+{
+    "name": "pure-javaScript-html5-parser",
+    "author": "munawwar",
+    "description": "HTML5 Parser",
+    "version": "0.0.1",
+    "main": "htmlparser.js",
+    "dependencies": {
+        "jsdom": "0.10.3"
+    },
+    "devDependencies": {
+        "mocha": "1.18.2"
+    },
+    "directories": {
+        "test": "test"
+    },
+    "scripts": {
+        "test": "make test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Munawwar/Pure-JavaScript-HTML5-Parser"
+    },
+    "keywords": [
+        "html parser"
+    ],
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/Munawwar/Pure-JavaScript-HTML5-Parser/issues"
+    },
+    "homepage": "https://github.com/Munawwar/Pure-JavaScript-HTML5-Parser"
+}

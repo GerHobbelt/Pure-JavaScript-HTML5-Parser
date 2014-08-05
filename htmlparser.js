@@ -60,6 +60,9 @@
 	var special = makeMap("script,style");
 
 	var HTMLParser = function (html, handler) {
+		//remove trailing spaces
+		html = html.trim();
+
 		var index, chars, match, stack = [], last = html;
 		stack.last = function () {
 			return this[this.length - 1];
