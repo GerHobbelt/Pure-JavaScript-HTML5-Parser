@@ -36,6 +36,7 @@
 	// Regular Expressions for parsing tags and attributes
 	var startTag = /^<([-A-Za-z0-9_]+)((?:\s+[a-zA-Z_:][-a-zA-Z0-9_:.]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/,
 		endTag = /^<\/([-A-Za-z0-9_]+)[^>]*>/,
+		doctypeTag = /^<!DOCTYPE/i,
 		attr = /([a-zA-Z_:][-a-zA-Z0-9_:.]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g;
 
 	// Empty Elements - HTML 5
@@ -91,6 +92,15 @@
 					}
 
 					// start tag
+				} else if (doctypeTag.test(html)) {
+					index = html.indexOf(">");
+
+					if (index >= 0) {
+						if (handler.doctype)
+							handler.doctype(html.substring(0, index));
+						html = html.substring(index + 1);
+						chars = false;
+					}
 				} else if (html.indexOf("<") === 0) {
 					match = html.match(startTag);
 
@@ -307,6 +317,11 @@
 			},
 			comment: function (text) {
 				// create comment node
+				curParentNode.appendChild(doc.createComment(text));
+			},
+			doctype: function (text) {
+				//Since we support only HTML5 we create HTML5 doctype. This won't work on IE8-.
+				doc.insertBefore(doc.implementation.createDocumentType('html', '', ''), doc.firstChild);
 			}
 		});
 
