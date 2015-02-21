@@ -9,13 +9,8 @@
  * Original code by Erik Arvidsson, Mozilla Public License
  * http://erik.eae.net/simplehtmlparser/simplehtmlparser.js
  *
- * // or to get an DOM Document
+ * // To get a DocumentFragment. If doctype is defined then it returns a Document.
  * HTMLtoDOM(htmlString);
- *
- * // or to inject into an existing document/DOM node
- * HTMLtoDOM(htmlString, document);
- * HTMLtoDOM(htmlString, document.body);
- *
  */
 (function (root, factory) {
 	if (typeof define === 'function' && define.amd) {
@@ -96,7 +91,7 @@
 
 				if (match) {
 					html = html.substring(match[0].length);
-					match[0].replace(endTag, parseEndTag);
+					parseEndTag.apply(this, match);
 					chars = false;
 				}
 
@@ -122,12 +117,12 @@
 					chars = false;
 				}
 				// start tag
-			} else if (html.charAt(0) === "<") {
+			} else if (html[0] === "<") {
 				match = html.match(startTag);
 
 				if (match) {
 					html = html.substring(match[0].length);
-					match[0].replace(startTag, parseStartTag);
+					parseStartTag.apply(this, match);
 					chars = false;
 				} else { //ignore the angle bracket
 					html = html.substring(1);
@@ -244,7 +239,7 @@
 					one[tagName] = elem; //remember important tags
 				}
 
-				for (var attr in attrs)
+				for (var attr = 0; attr < attrs.length; attr += 1)
 					elem.setAttribute(attrs[attr].name, attrs[attr].value);
 
 				if (structure[tagName] && typeof one[structure[tagName]] !== "boolean")
