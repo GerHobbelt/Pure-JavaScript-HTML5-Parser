@@ -35,11 +35,11 @@ While this library doesn’t cover the full gamut of possible weirdness that HTM
     HTMLtoDOM("<input disabled>") == '<input disabled="disabled">'
 
 Following should be supported again in future:
-~~A couple points are enforced by this method:
+~~A couple points are enforced by this method:~~
 
- - There will always be a html, head, body, and title element.
- - There will only be one html, head, body, and title element (if the user specifies more, then will be moved to the appropriate locations and merged).
-link and base elements are forced into the head.~~
+~~- There will always be a html, head, body, and title element.~~
+~~- There will only be one html, head, body, and title element (if the user specifies more, then will be moved to the appropriate locations and merged).~~
+~~link and base elements are forced into the head.~~
 
 ### Advanced: SAX-style API ###
 
