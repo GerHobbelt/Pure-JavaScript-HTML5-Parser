@@ -1,5 +1,3 @@
-/*global DOMDocument, ActiveXObject*/
-
 /*
  * HTML5 Parser
  *
@@ -35,10 +33,11 @@
 	var document = window.document;
 
 	// Regular Expressions for parsing tags and attributes
-	var startTag = /^<([-A-Za-z0-9_]+)((?:\s+[a-zA-Z_:][-a-zA-Z0-9_:.]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/,
-		endTag = /^<\/([-A-Za-z0-9_]+)[^>]*>/,
+	var startTag = /^<([-\w:]+)((?:\s+[^\s\/>"'=]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/,
+		endTag = /^<\/([-\w:]+)[^>]*>/,
 		doctypeTag = /^<!DOCTYPE/i,
-		attr = /([a-zA-Z_:][-a-zA-Z0-9_:.]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g;
+		cdataTag = /^<!\[CDATA\[([\s\S]*?)\]\]>/i,
+		attr = /([^\s\/>"'=]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g;
 
 	// Empty Elements - HTML 5
 	var empty = makeMap("area,base,basefont,br,col,frame,hr,img,input,link,meta,param,embed,command,keygen,source,track,wbr");
@@ -71,70 +70,83 @@
 		while (html) {
 			chars = true;
 
-			// Make sure we're not in a script or style element
-			if (!stack.last() || !special[stack.last()]) {
-
-				// Comment
-				if (html.indexOf("<!--") === 0) {
-					index = html.indexOf("-->");
-
-					if (index >= 0) {
-						if (handler.comment)
-							handler.comment(html.substring(4, index));
-						html = html.substring(index + 3);
-						chars = false;
-					}
-
-					// end tag
-				} else if (html.indexOf("</") === 0) {
-					match = html.match(endTag);
-
-					if (match) {
-						html = html.substring(match[0].length);
-						match[0].replace(endTag, parseEndTag);
-						chars = false;
-					}
-
-					// start tag
-				} else if (doctypeTag.test(html)) {
-					index = html.indexOf(">");
-
-					if (index >= 0) {
-						if (handler.doctype)
-							handler.doctype(html.substring(0, index));
-						html = html.substring(index + 1);
-						chars = false;
-					}
-				} else if (html.indexOf("<") === 0) {
-					match = html.match(startTag);
-
-					if (match) {
-						html = html.substring(match[0].length);
-						match[0].replace(startTag, parseStartTag);
-						chars = false;
-					}
-				}
-
-				if (chars) {
-					index = html.indexOf("<");
-
-					var text = index < 0 ? html : html.substring(0, index);
-					html = index < 0 ? "" : html.substring(index);
-
-					if (handler.chars)
-						handler.chars(text);
-				}
-
-			} else {
+				//Handle script and style tags
+			if (special[stack.last()]) {
 				html = html.replace(new RegExp("([\\s\\S]*?)<\/" + stack.last() + "[^>]*>"), function (all, text) {
-					text = text.replace(/<!--([\s\S]*?)-->|<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1$2");
 					if (handler.chars)
 						handler.chars(text);
-
 					return "";
 				});
 
 				parseEndTag("", stack.last());
+				// Comment
+			} else if (html.substring(0, 4) === "<!--") {
+				index = html.indexOf("-->");
+
+				if (index >= 0) {
+					if (handler.comment)
+						handler.comment(html.substring(4, index));
+					html = html.substring(index + 3);
+					chars = false;
+				}
+
+				// end tag
+			} else if (html.substring(0, 2) === "</") {
+				match = html.match(endTag);
+
+				if (match) {
+					html = html.substring(match[0].length);
+					match[0].replace(endTag, parseEndTag);
+					chars = false;
+				}
+
+				//CDATA
+			} else if (html.substring(0, 9).toUpperCase() === '<![CDATA[') {
+				match = html.match(cdataTag);
+
+				if (match) {
+					if (handler.cdata)
+						handler.cdata(match[1]);
+					html = html.substring(match[0].length);
+					chars = false;
+				}
+
+				// doctype
+			} else if (doctypeTag.test(html)) {
+				index = html.indexOf(">");
+
+				if (index >= 0) {
+					if (handler.doctype)
+						handler.doctype(html.substring(0, index));
+					html = html.substring(index + 1);
+					chars = false;
+				}
+				// start tag
+			} else if (html.charAt(0) === "<") {
+				match = html.match(startTag);
+
+				if (match) {
+					html = html.substring(match[0].length);
+					match[0].replace(startTag, parseStartTag);
+					chars = false;
+				} else { //ignore the angle bracket
+					html = html.substring(1);
+					if (handler.chars) {
+						handler.chars('<');
+					}
+					chars = false;
+				}
+			}
+
+			if (chars) {
+				index = html.indexOf("<");
+
+				var text = index < 0 ? html : html.substring(0, index);
+				html = index < 0 ? "" : html.substring(index);
+
+				if (handler.chars) {
+					handler.chars(text);
+				}
 			}
 
 			if (html === last)
@@ -146,6 +158,7 @@
 		parseEndTag();
 
 		function parseStartTag(tag, tagName, rest, unary) {
+			var casePreservedTagName = tagName;
 			tagName = tagName.toLowerCase();
 
 			if (block[tagName]) {
@@ -180,7 +193,7 @@
 				});
 
 				if (handler.start)
-					handler.start(tagName, attrs, unary);
+					handler.start(casePreservedTagName, attrs, unary);
 			}
 		}
 
@@ -208,65 +221,28 @@
 		}
 	};
 
-	var HTMLtoDOM = function (html, doc) {
-		// There can be only one of these elements
-		var one = makeMap("html,head,body,title");
-
-		// Enforce a structure for the document
-		var structure = {
-			link: "head",
-			base: "head"
-		};
-
-		if (!doc) {
-			if (typeof DOMDocument !== "undefined")
-				doc = new DOMDocument();
-			else if (typeof document !== "undefined" && document.implementation && document.implementation.createDocument)
-				doc = document.implementation.createDocument("", "", null);
-		} else
-			doc = doc.ownerDocument ||
-				doc.getOwnerDocument && doc.getOwnerDocument() ||
-				doc;
-
-		var elems = [],
-			documentElement = doc.documentElement ||
-				doc.getDocumentElement && doc.getDocumentElement();
-
-		// If we're dealing with an empty document then we
-		// need to pre-populate it with the HTML document structure
-		if (!documentElement && doc.createElement) {
-			(function () {
-				var html = doc.createElement("html");
-				var head = doc.createElement("head");
-				head.appendChild(doc.createElement("title"));
-				html.appendChild(head);
-				html.appendChild(doc.createElement("body"));
-				doc.appendChild(html);
-			}());
-		}
-
-		// Find all the unique elements
-		if (doc.getElementsByTagName)
-			for (var i in one)
-				one[i] = doc.getElementsByTagName(i)[0];
-
-		// If we're working with a document, inject contents into
-		// the body element
-		var curParentNode = one.body;
+	var HTMLtoDOM = function (html) {
+		var doc = document,
+			newDoc = doc.createDocumentFragment(),
+			// There can be only one of these elements
+			one = makeMap("html,head,body,title"),
+			// Enforce a structure for the document
+			structure = {
+				link: "head",
+				base: "head"
+			},
+			elems = [newDoc],
+			curParentNode = newDoc;
 
 		HTMLParser(html, {
 			start: function (tagName, attrs, unary) {
-				// If it's a pre-built element, then we can ignore
-				// its construction
-				if (one[tagName]) {
-					curParentNode = one[tagName];
-					if (!unary) {
-						elems.push(curParentNode);
-					}
-					return;
-				}
-
 				var elem = doc.createElement(tagName);
+				if (tagName in one) {
+					if (one[tagName] !== true) {
+						return;
+					}
+					one[tagName] = elem; //remember important tags
+				}
 
 				for (var attr in attrs)
 					elem.setAttribute(attrs[attr].name, attrs[attr].value);
@@ -289,19 +265,29 @@
 				curParentNode = elems[elems.length - 1];
 			},
 			chars: function (text) {
-				curParentNode.appendChild(doc.createTextNode(text));
+				if (newDoc.nodeType === 11 || curParentNode !== newDoc) { //webkit throws error when trying to add text directly to a document.
+					curParentNode.appendChild(doc.createTextNode(text));
+				}
 			},
 			comment: function (text) {
 				// create comment node
 				curParentNode.appendChild(doc.createComment(text));
 			},
 			doctype: function (text) {
-				//Since we support only HTML5 we create HTML5 doctype. This won't work on IE8-.
-				doc.insertBefore(doc.implementation.createDocumentType('html', '', ''), doc.firstChild);
+				if (!newDoc.firstChild) {
+					newDoc = doc = document.implementation.createDocument("", "", null); //create empty document
+
+					elems = [newDoc];
+					curParentNode = newDoc;
+
+					//Since we support only HTML5 we create HTML5 doctype. This won't work on IE8-.
+					newDoc.insertBefore(newDoc.implementation.createDocumentType('html', '', ''), newDoc.firstChild);
+				}
 			}
 		});
 
-		return doc;
+		newDoc.normalize();
+		return newDoc;
 	};
 
 	function makeMap(str) {

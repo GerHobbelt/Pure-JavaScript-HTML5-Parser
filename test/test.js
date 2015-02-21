@@ -2,11 +2,11 @@
 
 var assert = require("assert"),
     fs = require('fs'),
-    HTMLToDOM = require('../htmlparser.js');
+    HTMLtoDOM = require('../htmlparser.js');
 
-describe('run HTMLToDOM test', function () {
+describe('run HTMLtoDOM test', function () {
     var html = fetch('test/test.html'),
-        doc = HTMLToDOM(html);
+        doc = HTMLtoDOM(html);
     it('it should have two nodes - doctype and html tag', function () {
         assert.equal(2, doc.childNodes.length);
     });

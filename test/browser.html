@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../htmlparser.js"></script>
+        <script>
+            window.onload = function () {
+                describe('run HTMLtoDOM test', function () {
+                    var html = fetch('test.html'),
+                        doc = HTMLtoDOM(html);
+                    it('it should have two nodes - doctype and html tag', function () {
+                        assert.equal(2, doc.childNodes.length);
+                    });
+                    it('html tag should have two child elements - head and body tag', function () {
+                        assert.equal(2, doc.childNodes[1].children.length);
+                    });
+                });
+            };
+
+
+            window.assert = {
+                equal: function (a, b) {
+                    if (a !== b) {
+                        throw new Error('Equality condition failed');
+                    }
+                }
+            };
+
+            function describe(testDescription, func) {
+                console.log(testDescription);
+                func();
+                /*try {
+                } catch (e) {
+                    console.log('Test failed');
+                    console.log(e);
+                }*/
+            }
+
+            function it(testDescription, func) {
+                console.log('    ' + testDescription);
+                func();
+            }
+
+            /*Utility functions*/
+            function fetch(pathToTextFile) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', pathToTextFile, false);
+                xhr.send();
+                return xhr.responseText;
+            }
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
