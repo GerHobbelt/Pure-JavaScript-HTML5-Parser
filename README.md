@@ -1,4 +1,6 @@
-# Pure JavaScript HTML5 Parser #
+# What's this? #
+
+Here is a small pure-JavaScript HTML5 parser that can run on browsers as well as NodeJS with [jsdom](https://github.com/tmpvar/jsdom).
 
 _Credit goes to John Resig for his [code](http://ejohn.org/blog/pure-javascript-html-parser/) written back in 2008 and Erik Arvidsson for his [code](http://erik.eae.net/simplehtmlparser/simplehtmlparser.js) written piror to that._
 This code has been updated to work with HTML 5 to fix several problems.
