@@ -2,7 +2,7 @@
     "name": "neutron-html5parser",
     "author": "munawwar",
     "description": "Small Pure-JS HTML5 Parser",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "main": "htmlparser.js",
     "dependencies": {
         "jsdom": "0.10.3"
