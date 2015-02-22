@@ -67,7 +67,7 @@
 
 				//Handle script and style tags
 			if (special[stack.last()]) {
-				html = html.replace(new RegExp("([\\s\\S]*?)<\/" + stack.last() + "[^>]*>"), function (all, text) {
+				html = html.replace(new RegExp("^([\\s\\S]*?)<\/" + stack.last() + "[^>]*>", 'i'), function (all, text) {
 					if (handler.chars)
 						handler.chars(text);
 					return "";
