@@ -14,7 +14,7 @@ For only server-side use case, you may like to use [htmlparser2](https://github.
 
 For only client-side use case, you can look into jQuery.parseHTML() or native DOMParser (IE10+).
 
-## Usage 
+## Usage
 
 Add htmlparser.js to head tag or require with nodejs.
 
@@ -22,7 +22,7 @@ Add htmlparser.js to head tag or require with nodejs.
 
     //Returns DocumentFragment.
     var documentfragment = HTMLtoDOM("<p>Hello <b>World");
-    
+
     //If doctype is given then returns HTMLDocument
     var doc = HTMLtoDOM("<!DOCTYPE html><htm><body>test</body></html>");
 
@@ -57,14 +57,14 @@ Following should be supported again in future:
 Handles tag, text, and comments with callbacks. For example, let’s say you wanted to implement a simple HTML to XML serialization scheme – you could do so using the following:
 
     var results = "";
- 
+
     HTMLtoDOM.Parser("<p id=test>hello <i>world", {
       start: function( tag, attrs, unary ) {
         results += "<" + tag;
-     
+
         for ( var i = 0; i < attrs.length; i++ )
           results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
-     
+
         results += ">";
       },
       end: function( tag ) {
@@ -77,7 +77,7 @@ Handles tag, text, and comments with callbacks. For example, let’s say you wan
         results += "<!--" + text + "-->";
       }
     });
- 
+
     results == '<p id="test">hello <i>world</i></p>"
 
 ### Benchmarking
@@ -88,7 +88,7 @@ htmlparser2                     : 3.96784 ms/file ± 2.40647
 high5                           : 5.06843 ms/file ± 2.82274
 htmlparser2-dom                 : 6.91778 ms/file ± 5.43420
 libxmljs                        : 7.58246 ms/file ± 9.68441
-neutron-html5parser             : 9.35592 ms/file ± 29.3379
+neutron-html5parser             : 8.67576 ms/file ± 29.3204
 parse5                          : 12.3944 ms/file ± 7.95640
 html-parser                     : 13.0493 ms/file ± 8.41101
 hubbub                          : 15.6221 ms/file ± 8.30366

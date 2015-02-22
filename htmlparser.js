@@ -32,7 +32,7 @@
 		endTag = /^<\/([-\w:]+)[^>]*>/,
 		doctypeTag = /^<!DOCTYPE/i,
 		cdataTag = /^<!\[CDATA\[([\s\S]*?)\]\]>/i,
-		attr = /^\s+([^\s\/>"'=]+)(?:\s*=\s*((?:"(?:\\.|[^"])*")|(?:'(?:\\.|[^'])*')|(?:[^>\s]+)))?/;
+		attr = /^\s+([^\s\/>"'=]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/;
 
 	// Empty Elements - HTML 5
 	var empty = makeMap("area,base,basefont,br,col,frame,hr,img,input,link,meta,param,embed,command,keygen,source,track,wbr");
@@ -178,7 +178,7 @@
 					rest = rest.substr(match[0].length);
 
 					name = match[1];
-					value = match[2] || (fillAttrs[name] ? name : "");
+					value = match[2] || match[3] || match[4] || (fillAttrs[name] ? name : "");
 
 					attrs.push({
 						name: name,
