@@ -3,12 +3,20 @@
     <head>
         <script src="../htmlparser.js"></script>
         <script>
+            var noop = function () {};
             window.onload = function () {
                 describe('run HTMLtoDOM test', function () {
-                    var html = fetch('test.html');
+                    var html = fetch('test.html'),
+                        doc = HTMLtoDOM(html);
 
                     console.profile();
-                    var doc = HTMLtoDOM(html);
+                    HTMLtoDOM.Parser(html, {
+                        start: noop,
+                        end: noop,
+                        chars: noop,
+                        comment: noop,
+                        doctype: noop
+                    });
                     console.profileEnd();
 
                     it('it should have two nodes - doctype and html tag', function () {
@@ -32,11 +40,6 @@
             function describe(testDescription, func) {
                 console.log(testDescription);
                 func();
-                /*try {
-                } catch (e) {
-                    console.log('Test failed');
-                    console.log(e);
-                }*/
             }
 
             function it(testDescription, func) {

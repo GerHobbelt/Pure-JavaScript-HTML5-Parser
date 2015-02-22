@@ -31,7 +31,6 @@
 		// Regular Expressions for parsing tags and attributes
 		var startTag = /^<([-\w:]+)((?:\s+[^\s\/>"'=]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/,
 			endTag = /^<\/([-\w:]+)[^>]*>/,
-			doctypeTag = /^<!DOCTYPE/i,
 			cdataTag = /^<!\[CDATA\[([\s\S]*?)\]\]>/i,
 			attr = /^\s+([^\s\/>"'=]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/;
 
@@ -77,16 +76,6 @@
 					html = html.replace(special[lastTag], specialReplacer);
 
 					parseEndTag("", lastTag);
-					// Comment
-				} else if (html.substring(0, 4) === "<!--") {
-					index = html.indexOf("-->");
-
-					if (index >= 0) {
-						if (handler.comment)
-							handler.comment(html.substring(4, index));
-						html = html.substring(index + 3);
-						chars = false;
-					}
 
 					// end tag
 				} else if (html.substring(0, 2) === "</") {
@@ -95,6 +84,17 @@
 					if (match) {
 						html = html.substring(match[0].length);
 						parseEndTag.apply(this, match);
+						chars = false;
+					}
+
+					// Comment
+				} else if (html.substring(0, 4) === "<!--") {
+					index = html.indexOf("-->");
+
+					if (index >= 0) {
+						if (handler.comment)
+							handler.comment(html.substring(4, index));
+						html = html.substring(index + 3);
 						chars = false;
 					}
 
@@ -110,7 +110,7 @@
 					}
 
 					// doctype
-				} else if (doctypeTag.test(html)) {
+				} else if (html.substring(0, 9).toUpperCase() === '<!DOCTYPE') {
 					index = html.indexOf(">");
 
 					if (index >= 0) {
