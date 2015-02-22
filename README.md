@@ -5,6 +5,15 @@ Here is a small pure-JavaScript HTML5 parser that can run on browsers as well as
 _Credit goes to John Resig for his [code](http://ejohn.org/blog/pure-javascript-html-parser/) written back in 2008 and Erik Arvidsson for his [code](http://erik.eae.net/simplehtmlparser/simplehtmlparser.js) written piror to that._
 This code has been updated to work with HTML 5 to fix several problems.
 
+## Use case
+
+For parsing templates on both client and server side.
+This library may soon be used internally in [htmlizer](https://github.com/Munawwar/htmlizer).
+
+For only server-side use case, you may like to use [htmlparser2](https://github.com/fb55/htmlparser2) or [high5](https://github.com/fb55/high5). Note: DOCTYPE gets ignored by htmlparser2.
+
+For only client-side use case, you can look into jQuery.parseHTML() or native DOMParser (IE10+).
+
 ## Usage 
 
 Add htmlparser.js to head tag or require with nodejs.
