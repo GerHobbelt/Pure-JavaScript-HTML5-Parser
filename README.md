@@ -73,16 +73,16 @@ Handles tag, text, and comments with callbacks. For example, let’s say you wan
 
 Benchmark done using [htmlparser-benchmark](https://github.com/AndreasMadsen/htmlparser-benchmark).
 ```
-gumbo-parser   : 30.6424 ms/file ± 15.7503
-high5          : 5.06843 ms/file ± 2.82274
-html-parser    : 13.0493 ms/file ± 8.41101
-html5          : 199.505 ms/file ± 251.290
-htmlparser     : 31.3679 ms/file ± 185.629
-htmlparser2-dom: 6.91778 ms/file ± 5.43420
-htmlparser2    : 3.96784 ms/file ± 2.40647
-hubbub         : 15.6221 ms/file ± 8.30366
-libxmljs       : 7.58246 ms/file ± 9.68441
-parse5         : 12.3944 ms/file ± 7.95640
-sax: <Error>
-Pure-JavaScript-HTML5-Parser: 11.7770 ms/file ± 29.4669
+htmlparser2                     : 3.96784 ms/file ± 2.40647
+high5                           : 5.06843 ms/file ± 2.82274
+htmlparser2-dom                 : 6.91778 ms/file ± 5.43420
+libxmljs                        : 7.58246 ms/file ± 9.68441
+Pure-JavaScript-HTML5-Parser    : 11.7770 ms/file ± 29.4669
+parse5                          : 12.3944 ms/file ± 7.95640
+html-parser                     : 13.0493 ms/file ± 8.41101
+hubbub                          : 15.6221 ms/file ± 8.30366
+gumbo-parser                    : 30.6424 ms/file ± 15.7503
+htmlparser                      : 31.3679 ms/file ± 185.629
+html5                           : 199.505 ms/file ± 251.290
+sax                             : <Error>
 ```
