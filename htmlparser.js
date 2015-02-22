@@ -52,7 +52,10 @@
 			fillAttrs = makeMap("checked,compact,declare,defer,disabled,ismap,multiple,nohref,noresize,noshade,nowrap,readonly,selected"),
 
 			// Special Elements (can contain anything)
-			special = makeMap("script,style");
+			special = {
+				script: /^([\s\S]*?)<\/script[^>]*>/i,
+				style: /^([\s\S]*?)<\/style[^>]*>/i
+			};
 
 		return function Parser(html, handler) {
 			//remove trailing spaces
@@ -60,7 +63,7 @@
 
 			var index, chars, match, stack = [], last = html, lastTag;
 
-			var scriptReplacer = function (all, text) {
+			var specialReplacer = function (all, text) {
 				if (handler.chars)
 					handler.chars(text);
 				return "";
@@ -71,7 +74,7 @@
 
 					//Handle script and style tags
 				if (special[lastTag]) {
-					html = html.replace(new RegExp("^([\\s\\S]*?)<\/" + lastTag + "[^>]*>", 'i'), scriptReplacer);
+					html = html.replace(special[lastTag], specialReplacer);
 
 					parseEndTag("", lastTag);
 					// Comment
