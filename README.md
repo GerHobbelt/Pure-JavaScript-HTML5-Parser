@@ -1,4 +1,4 @@
-# What's this? #
+# Neutron HTML5 Parser #
 
 Here is a small pure-JavaScript HTML5 parser that can run on browsers as well as NodeJS with [jsdom](https://github.com/tmpvar/jsdom).
 
