@@ -88,7 +88,7 @@ htmlparser2                     : 3.96784 ms/file ± 2.40647
 high5                           : 5.06843 ms/file ± 2.82274
 htmlparser2-dom                 : 6.91778 ms/file ± 5.43420
 libxmljs                        : 7.58246 ms/file ± 9.68441
-neutron-html5parser             : 11.7770 ms/file ± 29.4669
+neutron-html5parser             : 9.35592 ms/file ± 29.3379
 parse5                          : 12.3944 ms/file ± 7.95640
 html-parser                     : 13.0493 ms/file ± 8.41101
 hubbub                          : 15.6221 ms/file ± 8.30366
