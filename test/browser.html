@@ -5,8 +5,12 @@
         <script>
             window.onload = function () {
                 describe('run HTMLtoDOM test', function () {
-                    var html = fetch('test.html'),
-                        doc = HTMLtoDOM(html);
+                    var html = fetch('test.html');
+
+                    console.profile();
+                    var doc = HTMLtoDOM(html);
+                    console.profileEnd();
+
                     it('it should have two nodes - doctype and html tag', function () {
                         assert.equal(2, doc.childNodes.length);
                     });
