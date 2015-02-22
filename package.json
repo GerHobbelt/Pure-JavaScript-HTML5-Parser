@@ -1,7 +1,7 @@
 {
-    "name": "pure-javaScript-html5-parser",
+    "name": "neutron-html5parser",
     "author": "munawwar",
-    "description": "HTML5 Parser",
+    "description": "Small Pure-JS HTML5 Parser",
     "version": "0.0.1",
     "main": "htmlparser.js",
     "dependencies": {

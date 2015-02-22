@@ -32,7 +32,7 @@
 		endTag = /^<\/([-\w:]+)[^>]*>/,
 		doctypeTag = /^<!DOCTYPE/i,
 		cdataTag = /^<!\[CDATA\[([\s\S]*?)\]\]>/i,
-		attr = /([^\s\/>"'=]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g;
+		attr = /^\s+([^\s\/>"'=]+)(?:\s*=\s*((?:"(?:\\.|[^"])*")|(?:'(?:\\.|[^'])*')|(?:[^>\s]+)))?/;
 
 	// Empty Elements - HTML 5
 	var empty = makeMap("area,base,basefont,br,col,frame,hr,img,input,link,meta,param,embed,command,keygen,source,track,wbr");
@@ -172,20 +172,20 @@
 				stack.push(tagName);
 
 			if (handler.start) {
-				var attrs = [];
+				var attrs = [], match, name, value;
 
-				rest.replace(attr, function (match, name) {
-					var value = arguments[2] ? arguments[2] :
-						arguments[3] ? arguments[3] :
-						arguments[4] ? arguments[4] :
-						fillAttrs[name] ? name : "";
+				while ((match = rest.match(attr))) {
+					rest = rest.substr(match[0].length);
+
+					name = match[1];
+					value = match[2] || (fillAttrs[name] ? name : "");
 
 					attrs.push({
 						name: name,
 						value: value,
 						escaped: value.replace(/(^|[^\\])"/g, '$1\\\"') //"
 					});
-				});
+				}
 
 				if (handler.start)
 					handler.start(casePreservedTagName, attrs, unary);
