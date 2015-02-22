@@ -84,16 +84,16 @@ Handles tag, text, and comments with callbacks. For example, let’s say you wan
 
 Benchmark done using [htmlparser-benchmark](https://github.com/AndreasMadsen/htmlparser-benchmark).
 ```
-htmlparser2                     : 3.96784 ms/file ± 2.40647
-high5                           : 5.06843 ms/file ± 2.82274
-htmlparser2-dom                 : 6.91778 ms/file ± 5.43420
-libxmljs                        : 7.58246 ms/file ± 9.68441
-neutron-html5parser             : 8.67576 ms/file ± 29.3204
-parse5                          : 12.3944 ms/file ± 7.95640
-html-parser                     : 13.0493 ms/file ± 8.41101
-hubbub                          : 15.6221 ms/file ± 8.30366
-gumbo-parser                    : 30.6424 ms/file ± 15.7503
-htmlparser                      : 31.3679 ms/file ± 185.629
-html5                           : 199.505 ms/file ± 251.290
-sax                             : <Error>
+htmlparser2         : 3.77435 ms/file ± 2.30046
+high5               : 4.89995 ms/file ± 2.70910
+htmlparser2-dom     : 6.45836 ms/file ± 3.63921
+libxmljs            : 7.31509 ms/file ± 9.59136
+neutron-html5parser : 7.37645 ms/file ± 29.5436
+parse5              : 12.2023 ms/file ± 7.89285
+html-parser         : 12.6324 ms/file ± 8.01018
+hubbub              : 15.5119 ms/file ± 8.62464
+htmlparser          : 28.9323 ms/file ± 178.239
+gumbo-parser        : 30.7206 ms/file ± 15.9119
+html5               : 198.812 ms/file ± 250.475
+sax                 : <Error>
 ```
