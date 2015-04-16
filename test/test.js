@@ -2,7 +2,9 @@
 
 var assert = require("assert"),
     fs = require('fs'),
-    HTMLtoDOM = require('../htmlparser.js');
+    factory = require('../htmlparser.js'),
+    jsdom = require('jsdom'),
+    HTMLtoDOM = factory(jsdom.jsdom('').parentWindow);
 
 describe('run HTMLtoDOM test', function () {
     var html = fetch('test/test.html'),

@@ -16,9 +16,7 @@
 	if (typeof define === 'function' && define.amd) {
 		define(factory.bind(this));
 	} else if (typeof exports === 'object') { //nodejs
-		var jsdom = require('jsdom').jsdom,
-			window = jsdom('').parentWindow;
-		module.exports = factory(window);
+		module.exports = factory; //Need to pass jsdom window to initialize
 	} else {
 		root.HTMLtoDOM = factory();
 	}
