@@ -26,6 +26,11 @@ Add htmlparser.js to head tag or require with nodejs.
     //If doctype is given then returns HTMLDocument
     var doc = HTMLtoDOM("<!DOCTYPE html><htm><body>test</body></html>");
 
+    //on NodeJS
+    var factory = require('neutron-html5parser'),
+        jsdom = require('jsdom'),
+        HTMLtoDOM = factory(jsdom.jsdom('').parentWindow);
+
 While this library doesn’t cover the full gamut of possible weirdness that HTML provides, it does handle a lot of the most obvious stuff. All of the following are accounted for:
 
 **Unclosed Tags:**
