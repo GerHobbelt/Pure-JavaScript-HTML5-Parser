@@ -1,0 +1,36 @@
+{
+  "name": "CDATA",
+  "html": "<tag><![CDATA[ asdf ><asdf></adsf><> fo]]></tag><![CD>",
+  "expected": [
+    {
+      "event": "opentag",
+      "data": [
+        "tag"
+      ]
+    },
+    {
+      "event": "cdata",
+      "data": [
+        " asdf ><asdf></adsf><> fo"
+      ]
+    },
+    {
+      "event": "closetag",
+      "data": [
+        "tag"
+      ]
+    },
+    {
+      "event": "text",
+      "data": [
+        "<"
+      ]
+    },
+    {
+      "event": "text",
+      "data": [
+        "![CD>"
+      ]
+    }
+  ]
+}

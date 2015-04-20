@@ -23,6 +23,10 @@ describe('run element and text test - 01-simple.json', function () {
     runJSONTest('test/01-simple.json');
 });
 
+describe('run CDATA test - 04-cdata.json', function () {
+    runJSONTest('test/04-cdata.json');
+});
+
 describe('run self-closing tag test - 07-self-closing.json', function () {
     runJSONTest('test/07-self-closing.json');
 });
@@ -95,6 +99,22 @@ function runJSONTest(filePath) {
             var exp = meta;
             it('next should be a text event ', function () {
                 assert.equal('text', exp.event);
+            });
+
+            it('it should have value ' + exp.data[0], function () {
+                assert.equal(exp.data[0], text);
+            });
+
+            meta = json.expected[next++]; //Increment
+        },
+        cdata: function (text) {
+            if (!meta) {
+                throw new Error('More nodes than expected');
+            }
+            //it() calls seems to be running asyncronously. So make a closure to current test.
+            var exp = meta;
+            it('next should be a cdata event ', function () {
+                assert.equal('cdata', exp.event);
             });
 
             it('it should have value ' + exp.data[0], function () {
