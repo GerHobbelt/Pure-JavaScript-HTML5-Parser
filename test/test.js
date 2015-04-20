@@ -17,57 +17,109 @@ describe('run consolidated HTMLtoDOM test - multiple.html', function () {
     });
 });
 
-describe('run element and text test - 01-simple.html', function () {
-    var html = fetch('test/01-simple.html'),
-        df = HTMLtoDOM(html);
-    it('it should have exactly one tag', function () {
-        assert.equal(1, df.childNodes.length);
-    });
-    it('it should be a div', function () {
-        assert.equal('DIV', df.firstChild.nodeName);
-    });
-    it('class attribute of div should be "blah"', function () {
-        assert.equal('blah', df.firstChild.getAttribute('class'));
-    });
-    it('div tag should have one text node inside with text "Test"', function () {
-        assert.equal(1, df.firstChild.childNodes.length);
-        assert.equal(3, df.firstChild.firstChild.nodeType);
-        assert.equal('Test', df.firstChild.firstChild.nodeValue);
-    });
+
+
+describe('run element and text test - 01-simple.json', function () {
+    runJSONTest('test/01-simple.json');
 });
 
-describe('run self-closing tag test - 07-self-closing.html', function () {
-    var html = fetch('test/07-self-closing.html'),
-        df = HTMLtoDOM(html);
-    it('root should have exactly 2 immediate children', function () {
-        assert.equal(2, df.childNodes.length);
-    });
-    it('first child should be a anchor tag', function () {
-        assert.equal('A', df.firstChild.nodeName);
-    });
-    it('anchor tag href atrribute should be http://test.com/', function () {
-        assert.equal('http://test.com/', df.firstChild.attributes.href.value);
-    });
-    it('anchor tag should have child text node with "Foo" as it\'s value', function () {
-        assert.equal('Foo', df.firstChild.firstChild.nodeValue);
-    });
-    it('second child should be a hr tag', function () {
-        assert.equal('HR', df.childNodes[1].nodeName);
-    });
+describe('run self-closing tag test - 07-self-closing.json', function () {
+    runJSONTest('test/07-self-closing.json');
 });
 
-describe('run isolated less than angle bracket - 15-lt-whitespace.html', function () {
-    var html = fetch('test/15-lt-whitespace.html'),
-        df = HTMLtoDOM(html);
-    it('it should have exactly one child', function () {
-        assert.equal(1, df.childNodes.length);
-    });
-    it('it should be a text node with "a < b"', function () {
-        assert.equal('a < b', df.firstChild.nodeValue);
-    });
+describe('run isolated less than angle bracket - 15-lt-whitespace.json', function () {
+    runJSONTest('test/15-lt-whitespace.json');
 });
 
 /*Utility functions*/
 function fetch(pathToTextFile) {
     return fs.readFileSync(pathToTextFile, {encoding: 'utf8'});
+}
+
+function runJSONTest(filePath) {
+    var json = JSON.parse(fetch(filePath)),
+        next = 0,
+        meta = json.expected[next++];
+
+    var handlers = {
+        start: function (tagName, attrs, unary) {
+            if (!meta) {
+                throw new Error('More nodes than expected');
+            }
+            //it() calls seems to be running asyncronously. So make a closure to current test.
+            var exp = meta;
+            it('next should be an open tag event', function () {
+                assert.equal('opentag', exp.event);
+            });
+
+            it('it should be \'' + exp.data[0] + '\' tag', function () {
+                assert.equal(exp.data[0], tagName);
+            });
+
+            it('it should have ' + (exp.data.length - 1) + ' number of attrbute(s)', function () {
+                assert.equal(exp.data.length - 1, attrs.length);
+            });
+
+            exp.data.slice(1).forEach(function (expAttr, index) {
+                it('attribute number ' + (index + 1) +'\'s name should be ' + expAttr[0], function () {
+                    assert.equal(expAttr[0], attrs[index].name);
+                });
+                it('attribute number ' + (index + 1) +'\'s value should be ' + expAttr[1], function () {
+                    assert.equal(expAttr[1], attrs[index].value);
+                });
+            });
+
+            meta = json.expected[next++]; //Increment
+        },
+        end: function (tagName) {
+            if (!meta) {
+                throw new Error('More nodes than expected');
+            }
+            //it() calls seems to be running asyncronously. So make a closure to current test.
+            var exp = meta;
+            it('next should be a close tag event', function () {
+                assert.equal('closetag', exp.event);
+            });
+
+            it('it should be \'' + exp.data[0] + '\' tag', function () {
+                assert.equal(exp.data[0], tagName);
+            });
+
+            meta = json.expected[next++]; //Increment
+        },
+        chars: function (text) {
+            if (!meta) {
+                throw new Error('More nodes than expected');
+            }
+            //it() calls seems to be running asyncronously. So make a closure to current test.
+            var exp = meta;
+            it('next should be a text event ', function () {
+                assert.equal('text', exp.event);
+            });
+
+            it('it should have value ' + exp.data[0], function () {
+                assert.equal(exp.data[0], text);
+            });
+
+            meta = json.expected[next++]; //Increment
+        },
+        comment: function (text) {
+            if (!meta) {
+                throw new Error('More nodes than expected');
+            }
+            //it() calls seems to be running asyncronously. So make a closure to current test.
+            var exp = meta;
+            it('next should be a comment event ', function () {
+                assert.equal('comment', exp.event);
+            });
+
+            it('it should have value ' + exp.data[0], function () {
+                assert.equal(exp.data[0], text);
+            });
+
+            meta = json.expected[next++]; //Increment
+        }
+    };
+
+    HTMLtoDOM.Parser(json.html, handlers);
 }
