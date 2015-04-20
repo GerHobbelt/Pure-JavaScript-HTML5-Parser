@@ -45,6 +45,9 @@ describe('run self-closing tag test - 07-self-closing.html', function () {
     it('first child should be a anchor tag', function () {
         assert.equal('A', df.firstChild.nodeName);
     });
+    it('anchor tag href atrribute should be http://test.com/', function () {
+        assert.equal('http://test.com/', df.firstChild.attributes.href.value);
+    });
     it('anchor tag should have child text node with "Foo" as it\'s value', function () {
         assert.equal('Foo', df.firstChild.firstChild.nodeValue);
     });
