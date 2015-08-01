@@ -31,8 +31,20 @@ describe('run CDATA test - 04-cdata.json', function () {
     runJSONTest('test/04-cdata.json');
 });
 
+describe('run script templates test - 05-cdata-special.json', function () {
+    runJSONTest('test/05-cdata-special.json');
+});
+
+describe('run script templates test - 06-leading-lt.json', function () {
+    runJSONTest('test/06-leading-lt.json');
+});
+
 describe('run self-closing tag test - 07-self-closing.json', function () {
     runJSONTest('test/07-self-closing.json');
+});
+
+describe('run self-closing tag test - 09-attributes.json', function () {
+    runJSONTest('test/09-attributes.json');
 });
 
 describe('run isolated less than angle bracket - 15-lt-whitespace.json', function () {

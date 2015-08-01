@@ -27,10 +27,10 @@
 
 	var HTMLParser = (function () {
 		// Regular Expressions for parsing tags and attributes
-		var startTag = /^<([-\w:]+)((?:\s+[^\s\/>"'=]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)\s*>/,
+		var startTag = /^<([-\w:]+)((?:\s*[^\s\/>"'=]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)\s*>/,
 			endTag = /^<\/([-\w:]+)[^>]*>/,
 			cdataTag = /^<!\[CDATA\[([\s\S]*?)\]\]>/i,
-			attr = /^\s+([^\s\/>"'=]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/;
+			attr = /^\s*([^\s\/>"'=]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/;
 
 			// Empty Elements - HTML 5
 		var empty = makeMap("area,base,basefont,br,col,frame,hr,img,input,link,meta,param,embed,command,keygen,source,track,wbr"),
@@ -44,9 +44,6 @@
 			// Elements that you can, intentionally, leave open
 			// (and which close themselves)
 			closeSelf = makeMap("colgroup,dd,dt,li,options,p,td,tfoot,th,thead,tr"),
-
-			// Attributes that have their values filled in disabled="disabled"
-			fillAttrs = makeMap("checked,compact,declare,defer,disabled,ismap,multiple,nohref,noresize,noshade,nowrap,readonly,selected"),
 
 			// Special Elements (can contain anything)
 			special = {
@@ -183,7 +180,7 @@
 						rest = rest.substr(match[0].length);
 
 						name = match[1];
-						value = match[2] || match[3] || match[4] || (fillAttrs[name] ? name : "");
+						value = match[2] || match[3] || match[4] || '';
 
 						attrs.push({
 							name: name,
