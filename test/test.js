@@ -23,6 +23,10 @@ describe('run element and text test - 01-simple.json', function () {
     runJSONTest('test/01-simple.json');
 });
 
+describe('run script templates test - 02-template.json', function () {
+    runJSONTest('test/02-template.json');
+});
+
 describe('run CDATA test - 04-cdata.json', function () {
     runJSONTest('test/04-cdata.json');
 });
@@ -65,10 +69,10 @@ function runJSONTest(filePath) {
             });
 
             exp.data.slice(1).forEach(function (expAttr, index) {
-                it('attribute number ' + (index + 1) +'\'s name should be ' + expAttr[0], function () {
+                it('attribute number ' + (index + 1) + '\'s name should be ' + expAttr[0], function () {
                     assert.equal(expAttr[0], attrs[index].name);
                 });
-                it('attribute number ' + (index + 1) +'\'s value should be ' + expAttr[1], function () {
+                it('attribute number ' + (index + 1) + '\'s value should be ' + expAttr[1], function () {
                     assert.equal(expAttr[1], attrs[index].value);
                 });
             });

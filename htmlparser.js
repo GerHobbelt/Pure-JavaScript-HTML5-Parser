@@ -72,6 +72,7 @@
 					//Handle script and style tags
 				if (special[lastTag]) {
 					html = html.replace(special[lastTag], specialReplacer);
+					chars = false;
 
 					parseEndTag("", lastTag);
 
@@ -163,6 +164,7 @@
 					}
 				}
 
+				//TODO: In addition to lastTag === tagName, also check special case for th, td, tfoot, tbody, thead
 				if (closeSelf[tagName] && lastTag === tagName) {
 					parseEndTag("", tagName);
 				}
