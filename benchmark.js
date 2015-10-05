@@ -1,5 +1,5 @@
 var benchmark = require('htmlparser-benchmark');
-var HTMLtoDOM = require("./htmlparser.js");
+var HTMLtoDOM = require("./htmlparser.js")();
 
 var bench = benchmark(function (html, callback) {
     var noop = function () {};
