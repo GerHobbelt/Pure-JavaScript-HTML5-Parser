@@ -27,10 +27,10 @@
 
 	var HTMLParser = (function () {
 		// Regular Expressions for parsing tags and attributes
-		var startTag = /^<([-\w:]+)((?:\s*[^\s\/>"'=]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)\s*>/,
+		var startTag = /^<([-\w:]+)((?:\s+[^\s\/>"'=]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)\s*>/,
 			endTag = /^<\/([-\w:]+)[^>]*>/,
 			cdataTag = /^<!\[CDATA\[([\s\S]*?)\]\]>/i,
-			attr = /^\s*([^\s\/>"'=]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/;
+			attr = /^\s+([^\s\/>"'=]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/;
 
 			// Empty Elements - HTML 5
 		var empty = makeMap("area,base,basefont,br,col,frame,hr,img,input,link,meta,param,embed,command,keygen,source,track,wbr"),
