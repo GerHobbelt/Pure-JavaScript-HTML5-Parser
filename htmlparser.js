@@ -1,8 +1,9 @@
 /*
- * HTML5 Parser By Sam Blowes
+ * HTML5 Parser
  *
  * Designed for HTML5 documents
  *
+ * Original Code from HTML5 Parser By Sam Blowes (https://github.com/blowsie/Pure-JavaScript-HTML5-Parser)
  * Original code by John Resig (ejohn.org)
  * http://ejohn.org/blog/pure-javascript-html-parser/
  * Original code by Erik Arvidsson, Mozilla Public License
@@ -59,74 +60,90 @@
  * Usage
  * ----------------------------------------------------------------------------
  *
- * // Use like so:
- * HTMLParser(htmlString, {
- *     start: function(tag, attrs, unary) {},
- *     end: function(tag) {},
- *     chars: function(text) {},
- *     comment: function(text) {}
- * });
- *
- * // or to get an XML string:
- * HTMLtoXML(htmlString);
- *
- * // or to get an XML DOM Document
+ * // To get a DocumentFragment. If doctype is defined then it returns a Document.
  * HTMLtoDOM(htmlString);
- *
- * // or to inject into an existing document/DOM node
- * HTMLtoDOM(htmlString, document);
- * HTMLtoDOM(htmlString, document.body);
- *
  */
+(function (root, factory) {
+	if (typeof define === 'function' && define.amd) {
+		define(factory.bind(this));
+	} else if (typeof exports === 'object') { //nodejs
+		module.exports = factory; //Need to pass jsdom window to initialize
+	} else {
+		root.HTMLtoDOM = factory();
+	}
+}(this, function (window) {
+	//browser and jsdom compatibility
+	window = window || this;
+	var document = window.document;
 
-(function () {
+	var HTMLParser = (function () {
+		// Regular Expressions for parsing tags and attributes
+		var startTag = /^<([-\w:]+)((?:\s+[^\s\/>"'=]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)\s*>/,
+			endTag = /^<\/([-\w:]+)[^>]*>/,
+			cdataTag = /^<!\[CDATA\[([\s\S]*?)\]\]>/i,
+			attr = /^\s+([^\s\/>"'=]+)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/;
 
-	// Regular Expressions for parsing tags and attributes
-	var startTag = /^<([-A-Za-z0-9_]+)((?:\s+[a-zA-Z_:][-a-zA-Z0-9_:.]*(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)>/,
-		endTag = /^<\/([-A-Za-z0-9_]+)[^>]*>/,
-		attr = /([a-zA-Z_:][-a-zA-Z0-9_:.]*)(?:\s*=\s*(?:(?:"((?:\\.|[^"])*)")|(?:'((?:\\.|[^'])*)')|([^>\s]+)))?/g;
+			// Empty Elements - HTML 5
+		var empty = makeMap("area,base,basefont,br,col,frame,hr,img,input,link,meta,param,embed,command,keygen,source,track,wbr"),
 
-	// Empty Elements - HTML 5
-	var empty = makeMap("area,base,basefont,br,col,frame,hr,img,input,link,meta,param,embed,command,keygen,source,track,wbr");
+			// Block Elements - HTML 5
+			block = makeMap("address,article,applet,aside,audio,blockquote,button,canvas,center,dd,del,dir,div,dl,dt,fieldset,figcaption,figure,footer,form,frameset,h1,h2,h3,h4,h5,h6,header,hgroup,hr,iframe,ins,isindex,li,map,menu,noframes,noscript,object,ol,output,p,pre,section,script,table,tbody,td,tfoot,th,thead,tr,ul,video"),
 
-	// Block Elements - HTML 5
-	var block = makeMap("address,article,applet,aside,audio,blockquote,button,canvas,center,dd,del,dir,div,dl,dt,fieldset,figcaption,figure,footer,form,frameset,h1,h2,h3,h4,h5,h6,header,hgroup,hr,iframe,ins,isindex,li,map,menu,noframes,noscript,object,ol,output,p,pre,section,script,table,tbody,td,tfoot,th,thead,tr,ul,video");
+			// Inline Elements - HTML 5
+			inline = makeMap("a,abbr,acronym,applet,b,basefont,bdo,big,br,button,cite,code,del,dfn,em,font,i,iframe,img,input,ins,kbd,label,map,object,q,s,samp,script,select,small,span,strike,strong,sub,sup,textarea,tt,u,var"),
 
-	// Inline Elements - HTML 5
-	var inline = makeMap("a,abbr,acronym,applet,b,basefont,bdo,big,br,button,cite,code,del,dfn,em,font,i,iframe,img,input,ins,kbd,label,map,object,q,s,samp,script,select,small,span,strike,strong,sub,sup,textarea,tt,u,var");
+			// Elements that you can, intentionally, leave open
+			// (and which close themselves)
+			closeSelf = makeMap("colgroup,dd,dt,li,options,p,td,tfoot,th,thead,tr"),
 
-	// Elements that you can, intentionally, leave open
-	// (and which close themselves)
-	var closeSelf = makeMap("colgroup,dd,dt,li,options,p,td,tfoot,th,thead,tr");
+			// Special Elements (can contain anything)
+			special = {
+				script: /^([\s\S]*?)<\/script[^>]*>/i,
+				style: /^([\s\S]*?)<\/style[^>]*>/i
+			};
 
-	// Attributes that have their values filled in disabled="disabled"
-	var fillAttrs = makeMap("checked,compact,declare,defer,disabled,ismap,multiple,nohref,noresize,noshade,nowrap,readonly,selected");
+	    /**
+	     * This class parses an HTML/XML document.
+	     * 
+	     * @param {String} html    HTML/XML document
+	     * @param {Object} handler Plain object
+	     * 
+	     * @return {HTMLParser}
+	     */
+		return function Parser(html, handler) {
+			//remove trailing spaces
+			html = html.trim();
 
-	// Special Elements (can contain anything)
-	var special = makeMap("script,style");
+			var index, chars, match, stack = [], last = html, lastTag;
 
-    /**
-     * This class parses an HTML/XML document.
-     * 
-     * @param {String} html    HTML/XML document
-     * @param {Object} handler Plain object
-     * 
-     * @return {HTMLParser}
-     */
-	var HTMLParser = this.HTMLParser = function (html, handler) {
-		var index, chars, match, stack = [], last = html;
-		stack.last = function () {
-			return this[this.length - 1];
-		};
+			var specialReplacer = function (all, text) {
+				if (handler.chars)
+					handler.chars(text);
+				return "";
+			};
 
-		while (html) {
-			chars = true;
+			while (html) {
+				chars = true;
 
-			// Make sure we're not in a script or style element
-			if (!stack.last() || !special[stack.last()]) {
+					//Handle script and style tags
+				if (special[lastTag]) {
+					html = html.replace(special[lastTag], specialReplacer);
+					chars = false;
 
-				// Comment
-				if (html.indexOf("<!--") == 0) {
+					parseEndTag("", lastTag);
+
+					// end tag
+				} else if (html.substring(0, 2) === "</") {
+					match = html.match(endTag);
+
+					if (match) {
+						html = html.substring(match[0].length);
+						parseEndTag.apply(this, match);
+						chars = false;
+					}
+
+					// Comment
+				} else if (html.substring(0, 4) === "<!--") {
 					index = html.indexOf("-->");
 
 					if (index >= 0) {
@@ -136,23 +153,40 @@
 						chars = false;
 					}
 
-					// end tag
-				} else if (html.indexOf("</") == 0) {
-					match = html.match(endTag);
+					//CDATA
+				} else if (html.substring(0, 9).toUpperCase() === '<![CDATA[') {
+					match = html.match(cdataTag);
 
 					if (match) {
+						if (handler.cdata)
+							handler.cdata(match[1]);
 						html = html.substring(match[0].length);
-						match[0].replace(endTag, parseEndTag);
 						chars = false;
 					}
 
+					// doctype
+				} else if (html.substring(0, 9).toUpperCase() === '<!DOCTYPE') {
+					index = html.indexOf(">");
+
+					if (index >= 0) {
+						if (handler.doctype)
+							handler.doctype(html.substring(0, index));
+						html = html.substring(index + 1);
+						chars = false;
+					}
 					// start tag
-				} else if (html.indexOf("<") == 0) {
+				} else if (html[0] === "<") {
 					match = html.match(startTag);
 
 					if (match) {
 						html = html.substring(match[0].length);
-						match[0].replace(startTag, parseStartTag);
+						parseStartTag.apply(this, match);
+						chars = false;
+					} else { //ignore the angle bracket
+						html = html.substring(1);
+						if (handler.chars) {
+							handler.chars('<');
+						}
 						chars = false;
 					}
 				}
@@ -163,190 +197,116 @@
 					var text = index < 0 ? html : html.substring(0, index);
 					html = index < 0 ? "" : html.substring(index);
 
-					if (handler.chars)
+					if (handler.chars) {
 						handler.chars(text);
+					}
 				}
 
-			} else {
-				html = html.replace(new RegExp("([\\s\\S]*?)<\/" + stack.last() + "[^>]*>"), function (all, text) {
-					text = text.replace(/<!--([\s\S]*?)-->|<!\[CDATA\[([\s\S]*?)]]>/g, "$1$2");
-					if (handler.chars)
-						handler.chars(text);
-
-					return "";
-				});
-
-				parseEndTag("", stack.last());
+				if (html === last)
+					throw "Parse Error: " + html;
+				last = html;
 			}
 
-			if (html == last)
-				throw "Parse Error: " + html;
-			last = html;
-		}
+			// Clean up any remaining tags
+			parseEndTag();
 
-		// Clean up any remaining tags
-		parseEndTag();
+			function parseStartTag(tag, tagName, rest, unary) {
+				var casePreservedTagName = tagName;
+				tagName = tagName.toLowerCase();
 
-		function parseStartTag(tag, tagName, rest, unary) {
-			tagName = tagName.toLowerCase();
+				if (block[tagName]) {
+					while (lastTag && inline[lastTag]) {
+						parseEndTag("", lastTag);
+					}
+				}
 
-			if (block[tagName]) {
-				while (stack.last() && inline[stack.last()]) {
-					parseEndTag("", stack.last());
+				//TODO: In addition to lastTag === tagName, also check special case for th, td, tfoot, tbody, thead
+				if (closeSelf[tagName] && lastTag === tagName) {
+					parseEndTag("", tagName);
+				}
+
+				unary = empty[tagName] || !!unary;
+
+				if (!unary) {
+					stack.push(tagName);
+					lastTag = tagName;
+				}
+
+				if (handler.start) {
+					var attrs = [], match, name, value;
+
+					while ((match = rest.match(attr))) {
+						rest = rest.substr(match[0].length);
+
+						name = match[1];
+						value = match[2] || match[3] || match[4] || '';
+
+						attrs.push({
+							name: name,
+							value: value,
+							escaped: value.replace(/(^|[^\\])"/g, '$1\\\"') //"
+						});
+					}
+
+					if (handler.start)
+						handler.start(casePreservedTagName, attrs, unary);
 				}
 			}
 
-			if (closeSelf[tagName] && stack.last() == tagName) {
-				parseEndTag("", tagName);
+			function parseEndTag(tag, tagName) {
+				var pos;
+				// If no tag name is provided, clean shop
+				if (!tagName)
+					pos = 0;
+
+					// Find the closest opened tag of the same type
+				else
+					for (pos = stack.length - 1; pos >= 0; pos -= 1)
+						if (stack[pos] === tagName)
+							break;
+
+				if (pos >= 0) {
+					// Close all the open elements, up the stack
+					for (var i = stack.length - 1; i >= pos; i -= 1)
+						if (handler.end)
+							handler.end(stack[i]);
+
+					// Remove the open elements from the stack
+					stack.length = pos;
+					lastTag = stack[pos - 1];
+				}
 			}
-
-			unary = empty[tagName] || !!unary;
-
-			if (!unary)
-				stack.push(tagName);
-
-			if (handler.start) {
-				var attrs = [];
-
-				rest.replace(attr, function (match, name) {
-					var value = arguments[2] ? arguments[2] :
-						arguments[3] ? arguments[3] :
-						arguments[4] ? arguments[4] :
-						fillAttrs[name] ? name : "";
-
-					attrs.push({
-						name: name,
-						value: value,
-						escaped: value.replace(/(^|[^\\])"/g, '$1\\\"') //"
-					});
-				});
-
-				if (handler.start)
-					handler.start(tagName, attrs, unary);
-			}
-		}
-
-		function parseEndTag(tag, tagName) {
-			// If no tag name is provided, clean shop
-			if (!tagName)
-				var pos = 0;
-
-				// Find the closest opened tag of the same type
-			else
-				for (var pos = stack.length - 1; pos >= 0; pos--)
-					if (stack[pos] == tagName)
-						break;
-
-			if (pos >= 0) {
-				// Close all the open elements, up the stack
-				for (var i = stack.length - 1; i >= pos; i--)
-					if (handler.end)
-						handler.end(stack[i]);
-
-				// Remove the open elements from the stack
-				stack.length = pos;
-			}
-		}
-	};
-
-    
-    /**
-     * Transforms a bad-formed HTML/XML document to a well-formed document.
-     * 
-     * @param {String} html HTML/XML document
-     * 
-     * @return {String}
-     */
-	this.HTMLtoXML = function (html) {
-		var results = "";
-
-		HTMLParser(html, {
-			start: function (tag, attrs, unary) {
-				results += "<" + tag;
-
-				for (var i = 0; i < attrs.length; i++)
-					results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
-                                results += unary? " />" : ">";
-			},
-			end: function (tag) {
-				results += "</" + tag + ">";
-			},
-			chars: function (text) {
-				results += text;
-			},
-			comment: function (text) {
-				results += "<!--" + text + "-->";
-			}
-		});
-
-		return results;
-	};
-
-	this.HTMLtoDOM = function (html, doc) {
-		// There can be only one of these elements
-		var one = makeMap("html,head,body,title");
-
-		// Enforce a structure for the document
-		var structure = {
-			link: "head",
-			base: "head"
 		};
 
-		if (!doc) {
-			if (typeof DOMDocument != "undefined")
-				doc = new DOMDocument();
-			else if (typeof document != "undefined" && document.implementation && document.implementation.createDocument)
-				doc = document.implementation.createDocument("", "", null);
-			else if (typeof ActiveX != "undefined")
-				doc = new ActiveXObject("Msxml.DOMDocument");
+	}());
 
-		} else
-			doc = doc.ownerDocument ||
-				doc.getOwnerDocument && doc.getOwnerDocument() ||
-				doc;
-
-		var elems = [],
-			documentElement = doc.documentElement ||
-				doc.getDocumentElement && doc.getDocumentElement();
-
-		// If we're dealing with an empty document then we
-		// need to pre-populate it with the HTML document structure
-		if (!documentElement && doc.createElement) (function () {
-			var html = doc.createElement("html");
-			var head = doc.createElement("head");
-			head.appendChild(doc.createElement("title"));
-			html.appendChild(head);
-			html.appendChild(doc.createElement("body"));
-			doc.appendChild(html);
-		})();
-
-		// Find all the unique elements
-		if (doc.getElementsByTagName)
-			for (var i in one)
-				one[i] = doc.getElementsByTagName(i)[0];
-
-		// If we're working with a document, inject contents into
-		// the body element
-		var curParentNode = one.body;
+	var HTMLtoDOM = function (html) {
+		var doc = document,
+			newDoc = doc.createDocumentFragment(),
+			// There can be only one of these elements
+			one = makeMap("html,head,body,title"),
+			// Enforce a structure for the document
+			structure = {
+				link: "head",
+				base: "head"
+			},
+			elems = [newDoc],
+			curParentNode = newDoc;
 
 		HTMLParser(html, {
 			start: function (tagName, attrs, unary) {
-				// If it's a pre-built element, then we can ignore
-				// its construction
-				if (one[tagName]) {
-					curParentNode = one[tagName];
-					if (!unary) {
-						elems.push(curParentNode);
+				var elem = doc.createElement(tagName);
+				if (tagName in one) {
+					if (one[tagName] !== true) {
+						return;
 					}
-					return;
+					one[tagName] = elem; //remember important tags
 				}
 
-				var elem = doc.createElement(tagName);
-
-				for (var attr in attrs)
+				for (var attr = 0; attr < attrs.length; attr += 1)
 					elem.setAttribute(attrs[attr].name, attrs[attr].value);
 
-				if (structure[tagName] && typeof one[structure[tagName]] != "boolean")
+				if (structure[tagName] && typeof one[structure[tagName]] !== "boolean")
 					one[structure[tagName]].appendChild(elem);
 
 				else if (curParentNode && curParentNode.appendChild)
@@ -357,21 +317,36 @@
 					curParentNode = elem;
 				}
 			},
-			end: function (tag) {
+			end: function () {
 				elems.length -= 1;
 
 				// Init the new parentNode
 				curParentNode = elems[elems.length - 1];
 			},
 			chars: function (text) {
-				curParentNode.appendChild(doc.createTextNode(text));
+				if (newDoc.nodeType === 11 || curParentNode !== newDoc) { //webkit throws error when trying to add text directly to a document.
+					curParentNode.appendChild(doc.createTextNode(text));
+				}
 			},
 			comment: function (text) {
 				// create comment node
+				curParentNode.appendChild(doc.createComment(text));
+			},
+			doctype: function () {
+				if (!newDoc.firstChild) {
+					newDoc = doc = document.implementation.createDocument("", "", null); //create empty document
+
+					elems = [newDoc];
+					curParentNode = newDoc;
+
+					//Since we support only HTML5 we create HTML5 doctype. This won't work on IE8-.
+					newDoc.insertBefore(newDoc.implementation.createDocumentType('html', '', ''), newDoc.firstChild);
+				}
 			}
 		});
 
-		return doc;
+		newDoc.normalize();
+		return newDoc;
 	};
 
 	function makeMap(str) {
@@ -380,4 +355,7 @@
 			obj[items[i]] = true;
 		return obj;
 	}
-})();
+
+	HTMLtoDOM.Parser = HTMLParser;
+	return HTMLtoDOM;
+}));

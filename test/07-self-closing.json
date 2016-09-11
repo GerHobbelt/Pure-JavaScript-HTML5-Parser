@@ -1,0 +1,37 @@
+{
+    "name": "Self-closing tags",
+    "html": "<a href=http://test.com/>Foo</a><hr / >",
+    "expected": [
+        {
+            "event": "opentag",
+            "data": [
+                "a",
+                ["href", "http://test.com/"]
+            ]
+        },
+        {
+            "event": "text",
+            "data": [
+                "Foo"
+            ]
+        },
+        {
+            "event": "closetag",
+            "data": [
+                "a"
+            ]
+        },
+        {
+            "event": "opentag",
+            "data": [
+                "hr"
+            ]
+        },
+        {
+            "event": "closetag",
+            "data": [
+                "hr"
+            ]
+        }
+    ]
+}

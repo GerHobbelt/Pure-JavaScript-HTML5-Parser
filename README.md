@@ -1,30 +1,76 @@
-# Pure JavaScript HTML5 Parser #
+# Neutron HTML5 Parser #
 
-
-A working demo can be seen [here](http://htmlpreview.github.io/?https://github.com/blowsie/Pure-JavaScript-HTML-Parser/blob/master/demo.html).
+Here is a small pure-JavaScript HTML5 parser that can run on browsers as well as NodeJS with [jsdom](https://github.com/tmpvar/jsdom).
 
 _Credit goes to John Resig for his [code](http://ejohn.org/blog/pure-javascript-html-parser/) written back in 2008 and Erik Arvidsson for his [code](http://erik.eae.net/simplehtmlparser/simplehtmlparser.js) written prior to that._
 
 This code has been updated to work with HTML 5 to fix several problems.
 
+## Use case
 
+For parsing templates on both client and server side.
+This library may soon be used internally in [htmlizer](https://github.com/Munawwar/htmlizer).
 
+For only server-side use case, you may like to use [htmlparser2](https://github.com/fb55/htmlparser2) or [high5](https://github.com/fb55/high5). Note: DOCTYPE gets ignored by htmlparser2.
 
-## 4 Libraries in One! ##
+For only client-side use case, you can look into jQuery.parseHTML() or native DOMParser (IE10+).
 
-### A SAX-style API ###
+## Usage
+
+Add htmlparser.js to head tag or require with nodejs.
+
+### DOM Builder ###
+
+    //Returns DocumentFragment.
+    var documentfragment = HTMLtoDOM("<p>Hello <b>World");
+
+    //If doctype is given then returns HTMLDocument
+    var doc = HTMLtoDOM("<!DOCTYPE html><htm><body>test</body></html>");
+
+    //on NodeJS
+    var factory = require('neutron-html5parser'),
+        jsdom = require('jsdom'),
+        HTMLtoDOM = factory(jsdom.jsdom('').parentWindow);
+
+While this library doesn’t cover the full gamut of possible weirdness that HTML provides, it does handle a lot of the most obvious stuff. All of the following are accounted for:
+
+**Unclosed Tags:**
+
+    HTMLtoDOM("<p><b>Hello") == '<p><b>Hello</b></p>'
+**Empty Elements:**
+
+    HTMLtoDOM("<img src=test.jpg>") == '<img src="test.jpg">'
+
+**Block vs. Inline Elements:**
+
+    HTMLtoDOM("<b>Hello <p>John") == '<b>Hello </b><p>John</p>'
+**Self-closing Elements:**
+
+    HTMLtoDOM("<p>Hello<p>World") == '<p>Hello</p><p>World</p>'
+**Attributes Without Values:**
+
+    HTMLtoDOM("<input disabled>") == '<input disabled="disabled">'
+
+Following should be supported again in future:
+~~A couple points are enforced by this method:~~
+
+~~- There will always be a html, head, body, and title element.~~
+~~- There will only be one html, head, body, and title element (if the user specifies more, then will be moved to the appropriate locations and merged).~~
+~~link and base elements are forced into the head.~~
+
+### Advanced: SAX-style API ###
 
 Handles tag, text, and comments with callbacks. For example, let’s say you wanted to implement a simple HTML to XML serialization scheme – you could do so using the following:
 
     var results = "";
- 
-    HTMLParser("<p id=test>hello <i>world", {
+
+    HTMLtoDOM.Parser("<p id=test>hello <i>world", {
       start: function( tag, attrs, unary ) {
         results += "<" + tag;
-     
+
         for ( var i = 0; i < attrs.length; i++ )
           results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
-     
+
         results += ">";
       },
       end: function( tag ) {
@@ -37,60 +83,23 @@ Handles tag, text, and comments with callbacks. For example, let’s say you wan
         results += "<!--" + text + "-->";
       }
     });
- 
+
     results == '<p id="test">hello <i>world</i></p>"
 
-### XML Serializer ###
+### Benchmarking
 
-Now, there’s no need to worry about implementing the above, since it’s included directly in the library, as well. Just feed in HTML and it spits back an XML string.
-
-    var results = HTMLtoXML("<p>Data: <input disabled>")
-    results == '<p>Data: <input disabled="disabled"></p>'
-
-
-### DOM Builder ###
-
-If you’re using the HTML parser to inject into an existing DOM document (or within an existing DOM element) then htmlparser.js provides a simple method for handling that:
-
-    // The following is appended into the document body
-    HTMLtoDOM("<p>Hello <b>World", document)
-     
-    // The follow is appended into the specified element
-    HTMLtoDOM("<p>Hello <b>World", document.getElementById("test"))
-
-
-### DOM Document Creator ###
-
-This is a more-advanced version of the DOM builder – it includes logic for handling the overall structure of a web page, returning a new DOM document.
-
-A couple points are enforced by this method:
-
- - There will always be a html, head, body, and title element.
- - There will only be one html, head, body, and title element (if the user specifies more, then will be moved to the appropriate locations and merged).
-link and base elements are forced into the head.
-
-You would use the method like so:
-
-    var dom = HTMLtoDOM("<p>Data: <input disabled>");
-    dom.getElementsByTagName("body").length == 1
-    dom.getElementsByTagName("p").length == 1
-
-
-While this library doesn’t cover the full gamut of possible weirdness that HTML provides, it does handle a lot of the most obvious stuff. All of the following are accounted for:
-
-**Unclosed Tags:**
-
-    HTMLtoXML("<p><b>Hello") == '<p><b>Hello</b></p>'
-**Empty Elements:**
-
-    HTMLtoXML("<img src=test.jpg>") == '<img src="test.jpg">'
-
-**Block vs. Inline Elements:**
-
-    HTMLtoXML("<b>Hello <p>John") == '<b>Hello </b><p>John</p>'
-**Self-closing Elements:**
-
-    HTMLtoXML("<p>Hello<p>World") == '<p>Hello</p><p>World</p>'
-**Attributes Without Values:**
-
-    HTMLtoXML("<input disabled>") == '<input disabled="disabled">'
+Benchmark done using [htmlparser-benchmark](https://github.com/AndreasMadsen/htmlparser-benchmark).
+```
+htmlparser2         : 3.77256 ms/file ± 2.29339
+high5               : 4.96011 ms/file ± 2.71494
+neutron-html5parser : 5.41695 ms/file ± 3.26307
+htmlparser2-dom     : 6.43134 ms/file ± 3.63845
+libxmljs            : 7.37534 ms/file ± 9.60274
+parse5              : 12.2405 ms/file ± 7.82065
+html-parser         : 12.6268 ms/file ± 8.30923
+hubbub              : 15.0666 ms/file ± 7.80456
+htmlparser          : 28.7801 ms/file ± 178.500
+gumbo-parser        : 29.8096 ms/file ± 15.5291
+html5               : 196.083 ms/file ± 248.159
+sax                 : <Error>
+```

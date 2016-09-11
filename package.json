@@ -1,0 +1,31 @@
+{
+    "name": "neutron-html5parser",
+    "author": "munawwar",
+    "description": "Small Pure-JS HTML5 Parser",
+    "version": "0.2.0",
+    "main": "htmlparser.js",
+    "dependencies": {
+    },
+    "devDependencies": {
+        "jsdom": "3.1.2",
+        "mocha": "2.2.5"
+    },
+    "directories": {
+        "test": "test"
+    },
+    "scripts": {
+        "test": "make test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Munawwar/neutron-html5parser"
+    },
+    "keywords": [
+        "html parser"
+    ],
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/Munawwar/neutron-html5parser/issues"
+    },
+    "homepage": "https://github.com/Munawwar/neutron-html5parser"
+}
