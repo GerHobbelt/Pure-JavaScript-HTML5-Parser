@@ -90,10 +90,10 @@
 	var empty = makeMap("area,base,basefont,br,col,frame,hr,img,input,link,meta,param,embed,command,keygen,source,track,wbr");
 
 	// Block Elements - HTML 5
-	var block = makeMap("a,address,article,applet,aside,audio,blockquote,button,canvas,center,dd,del,dir,div,dl,dt,fieldset,figcaption,figure,footer,form,frameset,h1,h2,h3,h4,h5,h6,header,hgroup,hr,iframe,ins,isindex,li,map,menu,noframes,noscript,object,ol,output,p,pre,section,script,table,tbody,td,tfoot,th,thead,tr,ul,video");
+	var block = makeMap("address,article,applet,aside,audio,blockquote,button,canvas,center,dd,del,dir,div,dl,dt,fieldset,figcaption,figure,footer,form,frameset,h1,h2,h3,h4,h5,h6,header,hgroup,hr,iframe,ins,isindex,li,map,menu,noframes,noscript,object,ol,output,p,pre,section,script,table,tbody,td,tfoot,th,thead,tr,ul,video");
 
 	// Inline Elements - HTML 5
-	var inline = makeMap("abbr,acronym,applet,b,basefont,bdo,big,br,button,cite,code,del,dfn,em,font,i,iframe,img,input,ins,kbd,label,map,object,q,s,samp,script,select,small,span,strike,strong,sub,sup,textarea,tt,u,var");
+	var inline = makeMap("a,abbr,acronym,applet,b,basefont,bdo,big,br,button,cite,code,del,dfn,em,font,i,iframe,img,input,ins,kbd,label,map,object,q,s,samp,script,select,small,span,strike,strong,sub,sup,textarea,tt,u,var");
 
 	// Elements that you can, intentionally, leave open
 	// (and which close themselves)
@@ -105,6 +105,14 @@
 	// Special Elements (can contain anything)
 	var special = makeMap("script,style");
 
+    /**
+     * This class parses an HTML/XML document.
+     * 
+     * @param {String} html    HTML/XML document
+     * @param {Object} handler Plain object
+     * 
+     * @return {HTMLParser}
+     */
 	var HTMLParser = this.HTMLParser = function (html, handler) {
 		var index, chars, match, stack = [], last = html;
 		stack.last = function () {
@@ -241,6 +249,14 @@
 		}
 	};
 
+    
+    /**
+     * Transforms a bad-formed HTML/XML document to a well-formed document.
+     * 
+     * @param {String} html HTML/XML document
+     * 
+     * @return {String}
+     */
 	this.HTMLtoXML = function (html) {
 		var results = "";
 
@@ -250,7 +266,7 @@
 
 				for (var i = 0; i < attrs.length; i++)
 					results += " " + attrs[i].name + '="' + attrs[i].escaped + '"';
-				results += ">";
+                                results += unary? " />" : ">";
 			},
 			end: function (tag) {
 				results += "</" + tag + ">";
